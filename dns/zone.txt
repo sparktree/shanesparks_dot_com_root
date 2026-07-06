@@ -1,32 +1,36 @@
-# DNS zone plan for shanesparks.com — the resurrection record.
-# The domain is the single irreplaceable asset: registrar 2FA on,
-# auto-renew on, registered under an email that does not depend on
-# this domain. Recreate these records at any DNS host in minutes.
-#
-# PREREQUISITE: the domain's DNS must be hosted on Cloudflare (free
-# plan) to attach a custom domain to the Worker. Point the registrar's
-# nameservers at the pair Cloudflare assigns.
+; DNS zone file for shanesparks.com — BIND format, importable via
+; Cloudflare dashboard: DNS > Records > Import and Export.
+;
+; The domain is the single irreplaceable asset: registrar 2FA on,
+; auto-renew on, registered under an email that does not depend on
+; this domain. Recreate this zone at any DNS host in minutes.
+;
+; NOT in this file (cannot be expressed as ordinary records):
+;   1. The apex (shanesparks.com -> Worker): Cloudflare creates and
+;      manages it when the custom domain is attached to the Worker
+;      (Workers & Pages > shanesparks-com > Settings > Domains & Routes).
+;   2. The www redirect rule: Rules > Redirect Rules >
+;      www.shanesparks.com/* -> https://shanesparks.com/$1 (301).
+;
+; After import, check proxy status in the dashboard:
+;   www    -> proxied (orange cloud), so the redirect rule fires
+;   mirror -> DNS only (gray cloud) — GitHub Pages must see the CNAME
+;             directly to verify the domain and issue its certificate
 
-# --- Primary: Cloudflare Worker (shanesparks-com) ----------------------
-# Added via dashboard or:  npx wrangler deploy (then Workers > Settings >
-# Domains & Routes > add custom domain). Cloudflare manages the apex
-# record itself once the custom domain is attached.
-shanesparks.com          -> Worker custom domain (managed by Cloudflare)
+$ORIGIN shanesparks.com.
+$TTL 3600
 
-# --- www redirect -------------------------------------------------------
-# CNAME www -> shanesparks.com (proxied), plus a Cloudflare "Redirect
-# Rule": www.shanesparks.com/* -> https://shanesparks.com/$1 (301).
-www                      CNAME  shanesparks.com
+; www resolves to the apex (Cloudflare flattens the CNAME)
+www     IN  CNAME  shanesparks.com.
 
-# --- GitHub Pages mirror (hot standby) ----------------------------------
-# Requires the CNAME line in scripts/deploy.ps1 to be uncommented, and
-# the custom domain set in the GitHub repo's Pages settings (this also
-# provisions HTTPS). If Cloudflare ever drops us: repoint the apex here.
-mirror                   CNAME  <username>.github.io
+; GitHub Pages mirror (hot standby). Requires the CNAME line in
+; scripts/deploy.ps1 uncommented and the custom domain set in the repo's
+; Pages settings. If Cloudflare ever drops us: repoint the apex here.
+mirror  IN  CNAME  sparktree.github.io.
 
-# --- CAA: only these CAs may issue certificates for the domain ----------
-shanesparks.com          CAA    0 issue "letsencrypt.org"
-shanesparks.com          CAA    0 issue "pki.goog"
-shanesparks.com          CAA    0 issue "ssl.com"
-# (Cloudflare provisions its edge certs via these CAs; GitHub Pages uses
-# Let's Encrypt. Adjust if either host's documentation changes.)
+; CAA: only these CAs may issue certificates for the domain.
+; Covers Cloudflare Universal SSL (letsencrypt.org / pki.goog / ssl.com)
+; and GitHub Pages (letsencrypt.org).
+@       IN  CAA    0 issue "letsencrypt.org"
+@       IN  CAA    0 issue "pki.goog"
+@       IN  CAA    0 issue "ssl.com"
