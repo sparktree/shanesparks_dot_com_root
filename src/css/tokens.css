@@ -27,17 +27,23 @@
 	   universe); #16161D is eigengrau (the color seen in the absence
 	   of light). Both facts, not materials — true to the medium. */
 	--seed-cyan-deep: #005a78;
+	--seed-cyan-bright: #75d1d9;
 	--seed-amber-deep: #ab7100;
 	--seed-cosmic-latte: #fff8e7;
 	--seed-eigengrau: #16161d;
+
+	/* --- Color rules (Shane, 2026-07-06) ----------------------------
+	   Non-link text is always eigengrau on cosmic latte or the inverse.
+	   Links: deep cyan on cosmic latte; bright cyan on eigengrau.
+	   Cyan and amber are highlights, never surfaces under text.
+	   Amber may itself be text on cosmic latte only — never on eigengrau. */
 
 	/* --- Scheme roles (light) -------------------------------------- */
 	--color-bg: var(--seed-cosmic-latte);
 	--color-fg: var(--seed-eigengrau);
 	--color-link: var(--seed-cyan-deep);
-	--color-accent: var(--seed-amber-deep);
-	/* DERIVED: quantized mixes of fg into bg */
-	--color-fg-muted: color-mix(in oklab, var(--color-fg) 64%, var(--color-bg));
+	--color-highlight: var(--seed-amber-deep);
+	/* DERIVED: rules/borders are a quantized mix of fg into bg (non-text) */
 	--color-rule: color-mix(in oklab, var(--color-fg) 20%, var(--color-bg));
 
 	/* --- Typefaces --------------------------------------------------
@@ -71,10 +77,9 @@
 	:root {
 		--color-bg: var(--seed-eigengrau);
 		--color-fg: var(--seed-cosmic-latte);
-		/* DERIVED: the deep seeds lack contrast on eigengrau, so they
-		   are mixed toward cosmic latte. Percentages are provisional —
-		   Shane may replace these with chosen hexes. */
-		--color-link: color-mix(in oklab, var(--seed-cyan-deep) 45%, var(--seed-cosmic-latte));
-		--color-accent: color-mix(in oklab, var(--seed-amber-deep) 50%, var(--seed-cosmic-latte));
+		--color-link: var(--seed-cyan-bright);
+		/* Amber remains the highlight in dark, but only as decoration
+		   (underlines, marks, symbols) — never as text on eigengrau. */
+		--color-highlight: var(--seed-amber-deep);
 	}
 }

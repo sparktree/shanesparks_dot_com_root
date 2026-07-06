@@ -52,8 +52,10 @@ a {
 	text-underline-offset: 0.1875em;
 }
 
+/* On hover the underline answers in amber; the text itself keeps the
+   link color in both schemes (amber may not be text on eigengrau). */
 a:hover {
-	color: var(--color-accent);
+	text-decoration-color: var(--color-highlight);
 }
 
 a:focus-visible {
@@ -61,8 +63,9 @@ a:focus-visible {
 	outline-offset: 2px;
 }
 
+/* Selection inverts fg/bg — text never sits on cyan or amber. */
 ::selection {
-	background: var(--color-accent);
+	background: var(--color-fg);
 	color: var(--color-bg);
 }
 

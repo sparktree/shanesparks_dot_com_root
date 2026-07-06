@@ -41,11 +41,12 @@
 	text-underline-offset: 0.1875em;
 }
 
+/* Footer text is full fg — non-link text is never a mixed/muted color;
+   de-emphasis comes from size and the display face alone. */
 .site-footer {
 	margin-top: var(--space-5);
 	padding-block: var(--space-3);
 	border-top: 1px solid var(--color-rule);
-	color: var(--color-fg-muted);
 	font-family: var(--font-display);
 	font-size: var(--text-s);
 }

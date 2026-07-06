@@ -31,7 +31,6 @@ permalink: /styleguide/
 	}
 	.swatch dd {
 		margin: 0;
-		color: var(--color-fg-muted);
 	}
 	.specimen {
 		border: 1px solid var(--color-rule);
@@ -41,7 +40,6 @@ permalink: /styleguide/
 	.specimen-charset {
 		font-family: var(--font-display);
 		word-break: break-all;
-		color: var(--color-fg-muted);
 	}
 	.scale-step {
 		margin-block: var(--space-2);
@@ -59,12 +57,16 @@ permalink: /styleguide/
 
 <h2>Seed palette</h2>
 
-<p>Four immutable seeds, chosen by hand. Every other color is a declared, quantized derivation of these.</p>
+<p>Five immutable seeds, chosen by hand.</p>
 
 <ul class="swatches">
 	<li class="swatch">
 		<div class="swatch-chip" style="background:#005a78"></div>
 		<dl><dt>deep cyan</dt><dd>#005A78</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#75d1d9"></div>
+		<dl><dt>bright cyan</dt><dd>#75D1D9</dd></dl>
 	</li>
 	<li class="swatch">
 		<div class="swatch-chip" style="background:#ab7100"></div>
@@ -80,13 +82,21 @@ permalink: /styleguide/
 	</li>
 </ul>
 
+<h2>Color rules</h2>
+
+<ul>
+	<li>Non-link text is always eigengrau on cosmic latte, or the inverse. No mixed or muted text colors.</li>
+	<li>Links are deep cyan on cosmic latte; bright cyan on eigengrau.</li>
+	<li>The cyans and amber are <strong>highlights</strong> — text never sits on them as a surface.</li>
+	<li>Amber may itself be text on cosmic latte only, never on eigengrau; elsewhere it is decoration (underlines, marks, symbols).</li>
+</ul>
+
 <h2>Scheme roles</h2>
 
 <p>
 	Rendered live from the active scheme — switch your system between light
-	and dark to watch them resolve. Dark-scheme link/accent values are
-	<em>derived</em> (seeds mixed toward cosmic latte for contrast) and remain
-	an open decision.
+	and dark to watch them resolve. Only the rule color is derived (a
+	quantized mix of fg into bg); it draws lines, never letters.
 </p>
 
 <ul class="swatches">
@@ -103,12 +113,8 @@ permalink: /styleguide/
 		<dl><dt>link</dt><dd>--color-link</dd></dl>
 	</li>
 	<li class="swatch">
-		<div class="swatch-chip" style="background:var(--color-accent)"></div>
-		<dl><dt>accent</dt><dd>--color-accent</dd></dl>
-	</li>
-	<li class="swatch">
-		<div class="swatch-chip" style="background:var(--color-fg-muted)"></div>
-		<dl><dt>fg muted</dt><dd>derived</dd></dl>
+		<div class="swatch-chip" style="background:var(--color-highlight)"></div>
+		<dl><dt>highlight</dt><dd>--color-highlight</dd></dl>
 	</li>
 	<li class="swatch">
 		<div class="swatch-chip" style="background:var(--color-rule)"></div>
@@ -161,9 +167,10 @@ permalink: /styleguide/
 <h2>Links &amp; interaction</h2>
 
 <p>
-	<a href="/">A link</a> is deep cyan with a 2px underline; on hover it
-	answers in deep amber. Selection inverts to amber on background.
-	Keyboard focus draws a visible 2px outline.
+	<a href="/">A link</a> is cyan — deep on cosmic latte, bright on
+	eigengrau — with a 2px underline. On hover the underline answers in
+	amber while the text holds its color. Selection inverts fg and bg
+	outright. Keyboard focus draws a visible 2px outline.
 </p>
 
 <h2>Alternative typefaces on file</h2>
