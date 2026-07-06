@@ -1,0 +1,191 @@
+---
+layout: layouts/base.njk
+title: Styleguide
+description: The living design system of this site — tokens, typefaces, and open decisions.
+permalink: /styleguide/
+---
+
+<style>
+	/* Page-local presentation for specimens and swatches. */
+	.swatches {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+		gap: var(--space-2);
+		padding: 0;
+		list-style: none;
+	}
+	.swatch {
+		border: 1px solid var(--color-rule);
+	}
+	.swatch-chip {
+		height: 3.5rem;
+	}
+	.swatch dl {
+		margin: 0;
+		padding: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--text-s);
+	}
+	.swatch dt {
+		font-weight: 400;
+	}
+	.swatch dd {
+		margin: 0;
+		color: var(--color-fg-muted);
+	}
+	.specimen {
+		border: 1px solid var(--color-rule);
+		padding: var(--space-3);
+		margin-block: var(--space-3);
+	}
+	.specimen-charset {
+		font-family: var(--font-display);
+		word-break: break-all;
+		color: var(--color-fg-muted);
+	}
+	.scale-step {
+		margin-block: var(--space-2);
+	}
+</style>
+
+<h1>Styleguide</h1>
+
+<p>
+	The living design system of this site. Guiding principle:
+	<strong>truth to mediums</strong> — what lives on a screen should be
+	inherently of the screen. Nothing here imitates paper, plastic, or any
+	other material.
+</p>
+
+<h2>Seed palette</h2>
+
+<p>Four immutable seeds, chosen by hand. Every other color is a declared, quantized derivation of these.</p>
+
+<ul class="swatches">
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#005a78"></div>
+		<dl><dt>deep cyan</dt><dd>#005A78</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#ab7100"></div>
+		<dl><dt>deep amber</dt><dd>#AB7100</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#fff8e7"></div>
+		<dl><dt>cosmic latte</dt><dd>#FFF8E7</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#16161d"></div>
+		<dl><dt>eigengrau</dt><dd>#16161D</dd></dl>
+	</li>
+</ul>
+
+<h2>Scheme roles</h2>
+
+<p>
+	Rendered live from the active scheme — switch your system between light
+	and dark to watch them resolve. Dark-scheme link/accent values are
+	<em>derived</em> (seeds mixed toward cosmic latte for contrast) and remain
+	an open decision.
+</p>
+
+<ul class="swatches">
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-bg)"></div>
+		<dl><dt>bg</dt><dd>--color-bg</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-fg)"></div>
+		<dl><dt>fg</dt><dd>--color-fg</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-link)"></div>
+		<dl><dt>link</dt><dd>--color-link</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-accent)"></div>
+		<dl><dt>accent</dt><dd>--color-accent</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-fg-muted)"></div>
+		<dl><dt>fg muted</dt><dd>derived</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-rule)"></div>
+		<dl><dt>rule</dt><dd>derived</dd></dl>
+	</li>
+</ul>
+
+<h2>Typefaces</h2>
+
+<div class="specimen">
+	<h3 style="margin-top:0">Departure Mono — display, labels, code</h3>
+	<p style="font-family:var(--font-display); font-size:var(--text-xl); margin-block:var(--space-2)">
+		Symbols in a digital landscape
+	</p>
+	<p class="specimen-charset">
+		ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
+		0123456789 ↑↓←→ ░▒▓█ ─│┌┐└┘ &amp;@#%*{}[]&lt;&gt;
+	</p>
+	<p>
+		A pixel-grid monospace with a lo-fi technical character — quantitative
+		without being arcade nostalgia. Single weight; hierarchy comes from
+		size and space. OFL, by Helena Zhang / Toshi Omagari.
+	</p>
+</div>
+
+<div class="specimen">
+	<h3 style="margin-top:0">Space Grotesk — body prose</h3>
+	<p>
+		Body text is set in Space Grotesk, a grotesque derived from the
+		monospaced Space Mono — its geometry is quantized at the skeleton even
+		though its spacing is proportional. It exists so that essays remain
+		effortless to read at length. To commit prose fully to the pixel grid
+		instead, set <code>--font-body: var(--font-display)</code> in
+		<code>tokens.css</code> — one token, entire site follows.
+	</p>
+</div>
+
+<h2>Type scale</h2>
+
+<p>Ratio 1.2 — distinction without drama, by decision.</p>
+
+<div class="specimen">
+	<p class="scale-step" style="font-size:var(--text-2xl); font-family:var(--font-display)">2xl · 1.728rem — page titles</p>
+	<p class="scale-step" style="font-size:var(--text-xl); font-family:var(--font-display)">xl · 1.44rem — section headings</p>
+	<p class="scale-step" style="font-size:var(--text-l); font-family:var(--font-display)">l · 1.2rem — subheadings</p>
+	<p class="scale-step" style="font-size:var(--text-m)">m · 1rem — body prose</p>
+	<p class="scale-step" style="font-size:var(--text-s)">s · 0.833rem — chrome, captions, metadata</p>
+</div>
+
+<h2>Links &amp; interaction</h2>
+
+<p>
+	<a href="/">A link</a> is deep cyan with a 2px underline; on hover it
+	answers in deep amber. Selection inverts to amber on background.
+	Keyboard focus draws a visible 2px outline.
+</p>
+
+<h2>Alternative typefaces on file</h2>
+
+<p>
+	Candidates that also satisfy "pixel-native, not campy" — any of these can
+	replace the current picks by swapping a woff2 and one token. All open
+	licenses (OFL).
+</p>
+
+<h3>Display alternatives</h3>
+<ul>
+	<li><strong>DotGothic16</strong> (Fontworks) — 16×16 bitmap gothic; quieter and rounder than Departure Mono; excellent Japanese support.</li>
+	<li><strong>Handjet</strong> (Rosetta) — variable dot-matrix face; element shape and grid density are variable axes — the most "quantitative" option of all, striking for headlines.</li>
+	<li><strong>Workbench</strong> — variable pixel face with a scan-line axis; more industrial.</li>
+	<li><strong>Silkscreen</strong> — minimal 5px UI pixel face; best at small sizes only.</li>
+</ul>
+
+<h3>Body alternatives</h3>
+<ul>
+	<li><strong>Space Mono</strong> — Space Grotesk's monospaced parent; stricter grid feel, slower to read at length.</li>
+	<li><strong>IBM Plex Mono</strong> — engineering-room voice, very readable.</li>
+	<li><strong>Iosevka</strong> — narrow, highly configurable; can be built to taste.</li>
+	<li><strong>Departure Mono as body</strong> — the full-commitment option; honest to the grid, heavier to read for essays.</li>
+</ul>

@@ -5,6 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>{% if title %}{{ title }} · {% endif %}{{ site.title }}</title>
 	<meta name="description" content="{{ description or site.description }}">
+	<link rel="preload" href="/fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/fonts/SpaceGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="stylesheet" href="/css/tokens.css">
 	<link rel="stylesheet" href="/css/base.css">
 	<link rel="stylesheet" href="/css/components.css">
@@ -13,7 +15,8 @@
 	<header class="site-header">
 		<a class="site-title" href="/">{{ site.title }}</a>
 		<nav class="site-nav" aria-label="Site">
-			<a href="/">Home</a>
+			<a href="/"{% if page.url == "/" %} aria-current="page"{% endif %}>Home</a>
+			<a href="/styleguide/"{% if page.url == "/styleguide/" %} aria-current="page"{% endif %}>Styleguide</a>
 		</nav>
 	</header>
 

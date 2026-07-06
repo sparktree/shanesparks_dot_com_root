@@ -1,41 +1,80 @@
 /* ============================================================
-   tokens.css — design tokens (color, type scale, spacing)
-   PLACEHOLDER: every value here is a deliberately neutral
-   default. The real tokens are Phase 1 aesthetic decisions,
-   made by Shane firsthand. Nothing below is a commitment.
+   tokens.css — design tokens
+   Decisions by Shane, 2026-07-06; brief in DESIGN.md.
+   Values marked DERIVED are computed from the seed palette and
+   remain open to his revision.
    ============================================================ */
 
+@font-face {
+	font-family: "Departure Mono";
+	src: url("/fonts/DepartureMono-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Space Grotesk";
+	src: url("/fonts/SpaceGrotesk-Variable.woff2") format("woff2-variations");
+	font-weight: 300 700;
+	font-style: normal;
+	font-display: swap;
+}
+
 :root {
-	/* Color — neutral grayscale placeholder */
-	--color-bg: #ffffff;
-	--color-text: #1a1a1a;
-	--color-text-muted: #555555;
-	--color-accent: #1a1a1a; /* placeholder: accent = text until a palette is chosen */
-	--color-rule: #dddddd;
+	/* --- Seed palette: immutable, chosen by Shane ------------------
+	   #FFF8E7 is cosmic latte (the measured average color of the
+	   universe); #16161D is eigengrau (the color seen in the absence
+	   of light). Both facts, not materials — true to the medium. */
+	--seed-cyan-deep: #005a78;
+	--seed-amber-deep: #ab7100;
+	--seed-cosmic-latte: #fff8e7;
+	--seed-eigengrau: #16161d;
 
-	/* Type — system stack placeholder until typefaces are chosen and self-hosted */
-	--font-body: system-ui, sans-serif;
-	--font-mono: ui-monospace, monospace;
-	--type-scale-ratio: 1.25; /* placeholder scale */
-	--font-size-base: 1rem;
+	/* --- Scheme roles (light) -------------------------------------- */
+	--color-bg: var(--seed-cosmic-latte);
+	--color-fg: var(--seed-eigengrau);
+	--color-link: var(--seed-cyan-deep);
+	--color-accent: var(--seed-amber-deep);
+	/* DERIVED: quantized mixes of fg into bg */
+	--color-fg-muted: color-mix(in oklab, var(--color-fg) 64%, var(--color-bg));
+	--color-rule: color-mix(in oklab, var(--color-fg) 20%, var(--color-bg));
 
-	/* Spacing */
+	/* --- Typefaces --------------------------------------------------
+	   Display/labels/code: Departure Mono (pixel-grid, single weight).
+	   Body prose: Space Grotesk (mono-derived geometry, variable).
+	   To commit body text to the pixel grid too, set
+	   --font-body: var(--font-display); everything else follows. */
+	--font-display: "Departure Mono", ui-monospace, monospace;
+	--font-body: "Space Grotesk", system-ui, sans-serif;
+	--font-mono: "Departure Mono", ui-monospace, monospace;
+
+	/* --- Type scale: ratio 1.2, modest by decision ------------------ */
+	--text-s: 0.833rem;
+	--text-m: 1rem;
+	--text-l: 1.2rem;
+	--text-xl: 1.44rem;
+	--text-2xl: 1.728rem;
+
+	/* --- Spacing ----------------------------------------------------- */
 	--space-1: 0.25rem;
 	--space-2: 0.5rem;
 	--space-3: 1rem;
 	--space-4: 2rem;
 	--space-5: 4rem;
 
-	/* Layout */
-	--measure: 65ch; /* comfortable reading width */
+	/* --- Layout ------------------------------------------------------ */
+	--measure: 65ch;
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--color-bg: #161616;
-		--color-text: #e6e6e6;
-		--color-text-muted: #a0a0a0;
-		--color-accent: #e6e6e6;
-		--color-rule: #383838;
+		--color-bg: var(--seed-eigengrau);
+		--color-fg: var(--seed-cosmic-latte);
+		/* DERIVED: the deep seeds lack contrast on eigengrau, so they
+		   are mixed toward cosmic latte. Percentages are provisional —
+		   Shane may replace these with chosen hexes. */
+		--color-link: color-mix(in oklab, var(--seed-cyan-deep) 45%, var(--seed-cosmic-latte));
+		--color-accent: color-mix(in oklab, var(--seed-amber-deep) 50%, var(--seed-cosmic-latte));
 	}
 }

@@ -1,7 +1,6 @@
 /* ============================================================
    base.css — element defaults and reading rhythm
-   PLACEHOLDER styling; see tokens.css. Phase 1 replaces this
-   with the hand-built design system.
+   Applies the token system; see tokens.css and DESIGN.md.
    ============================================================ */
 
 *,
@@ -15,26 +14,56 @@ body {
 	padding: var(--space-3);
 	max-width: var(--measure);
 	background: var(--color-bg);
-	color: var(--color-text);
+	color: var(--color-fg);
 	font-family: var(--font-body);
-	font-size: var(--font-size-base);
+	font-size: var(--text-m);
+	font-weight: 400;
 	line-height: 1.6;
 }
 
+/* Headings set in the pixel-grid display face. Departure Mono has a
+   single weight, so hierarchy comes from size and space, not boldness —
+   in keeping with the modest scale decision. */
 h1,
 h2,
 h3 {
-	line-height: 1.2;
+	font-family: var(--font-display);
+	font-weight: 400;
+	line-height: 1.25;
 	margin-block: var(--space-4) var(--space-2);
 }
 
+h1 {
+	font-size: var(--text-2xl);
+}
+
+h2 {
+	font-size: var(--text-xl);
+}
+
+h3 {
+	font-size: var(--text-l);
+}
+
 a {
+	color: var(--color-link);
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.1875em;
+}
+
+a:hover {
 	color: var(--color-accent);
 }
 
 a:focus-visible {
-	outline: 2px solid var(--color-accent);
+	outline: 2px solid var(--color-link);
 	outline-offset: 2px;
+}
+
+::selection {
+	background: var(--color-accent);
+	color: var(--color-bg);
 }
 
 img {
@@ -42,9 +71,30 @@ img {
 	height: auto;
 }
 
+/* For symbolic/map imagery: never let the browser smooth the grid away. */
+.pixelated,
+img.pixelated {
+	image-rendering: pixelated;
+}
+
 code,
-pre {
+pre,
+kbd,
+samp {
 	font-family: var(--font-mono);
+	font-size: 0.875em;
+}
+
+pre {
+	overflow-x: auto;
+	padding: var(--space-3);
+	border: 1px solid var(--color-rule);
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid var(--color-rule);
+	margin-block: var(--space-4);
 }
 
 @media (prefers-reduced-motion: reduce) {
