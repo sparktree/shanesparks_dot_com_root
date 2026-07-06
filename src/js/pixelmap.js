@@ -15,14 +15,16 @@
 	if (!canvas) return;
 	const ctx = canvas.getContext("2d");
 
-	const SIZE = 96; // CA grid; one cell = one rendered pixel
+	const SIZE = 128; // CA grid; one cell = one rendered pixel
 	canvas.width = SIZE;
 	canvas.height = SIZE;
 	host.classList.add("is-grown"); // drops the no-JS fallback pattern
 
 	const CYAN_DEEP = "#005a78";
 	const CYAN_BRIGHT = "#75d1d9";
-	const AMBER = "#ab7100";
+	/* Map-local amber: the seed #AB7100 reads brown at pixel scale here,
+	   so glints use it brightened ~1.35x (Shane, 2026-07-06). */
+	const AMBER_GLINT = "#e69800";
 
 	/* Deterministic PRNG (mulberry32) — the web is designed, not random:
 	   the same structure grows on every visit. */
@@ -38,9 +40,10 @@
 	const rand = mulberry32(0x5eed);
 
 	/* --- REGION GEOMETRY (extension point) ------------------------------
-	   Seed probability field: an asymmetric annular web with angular
-	   lobes and a faint core. Future subsections get their own angular
-	   sectors / probability fields and color assignments here. */
+	   Seed probability field: a filled disc, patterned by angular lobes
+	   interfering with a spiral ripple — populated throughout, denser
+	   and sparser in waves, with a soft organic boundary. Future
+	   subsections get their own sectors / fields and colors here. */
 	let grid = new Uint8Array(SIZE * SIZE);
 	const c = SIZE / 2;
 	for (let y = 0; y < SIZE; y++) {
@@ -49,10 +52,10 @@
 			const dy = y - c;
 			const r = Math.hypot(dx, dy) / c;
 			const a = Math.atan2(dy, dx);
-			const band = Math.exp(-((r - 0.62) ** 2) / 0.035);
-			const lobes = 0.6 + 0.4 * Math.sin(a * 3 + 1.7) * Math.sin(a * 5 - 0.4);
-			const core = 0.5 * Math.exp(-(r * r) / 0.02);
-			if (rand() < band * lobes * 0.95 + core) grid[y * SIZE + x] = 1;
+			const edge = 1 / (1 + Math.exp((r - 0.92) / 0.03));
+			const lobes = 0.28 * Math.sin(a * 3 + 1.7) * Math.sin(a * 5 - 0.4);
+			const ripple = 0.22 * Math.cos(r * 14 - a * 2);
+			if (rand() < edge * (0.52 + lobes + ripple) * 0.92) grid[y * SIZE + x] = 1;
 		}
 	}
 
@@ -76,17 +79,20 @@
 	}
 
 	/* Cells: the web is a mixture of the two cyans; dense cores glint
-	   amber. Alpha is quantized to three levels — depth, not blur. */
+	   amber. Alpha is quantized — depth, not blur. Glints stay near
+	   full strength so they read gold, never muddy. */
 	const ALPHAS = [0.45, 0.72, 1];
 	const cells = [];
 	for (let y = 0; y < SIZE; y++)
 		for (let x = 0; x < SIZE; x++) {
 			if (!grid[y * SIZE + x]) continue;
 			const n = neighbors(grid, x, y);
-			let color;
-			if (n >= 6 && rand() < 0.35) color = AMBER;
-			else color = rand() < 0.55 ? CYAN_DEEP : CYAN_BRIGHT;
-			cells.push({ x, y, color, a: ALPHAS[Math.floor(rand() * 3)] });
+			if (n >= 6 && rand() < 0.35) {
+				cells.push({ x, y, color: AMBER_GLINT, a: rand() < 0.5 ? 0.85 : 1 });
+			} else {
+				const color = rand() < 0.55 ? CYAN_DEEP : CYAN_BRIGHT;
+				cells.push({ x, y, color, a: ALPHAS[Math.floor(rand() * 3)] });
+			}
 		}
 
 	/* Pointer reaction: cells near the cursor are pushed outward and
@@ -108,7 +114,7 @@
 	}
 
 	function tick() {
-		const R = 14; // influence radius, in grid cells
+		const R = 18; // influence radius, in grid cells
 		let settled = true;
 		for (let i = 0; i < cells.length; i++) {
 			let tx = 0;

@@ -35,6 +35,10 @@ the way music does. **Use this to resolve any design ambiguity.**
    proximity displaces cells with spring-back, disabled under reduced-motion; no-JS
    fallback is a quantized checker with the label link still functional. Structure
    is the deliverable — visual tuning and subsections are placeholders for Shane.
+   *Revised per Shane (2026-07-06):* the field is a filled, patterned disc (angular
+   lobes × spiral ripple, soft boundary) at 128×128 rather than a perimeter ring;
+   glints use a map-local brightened amber `#E69800` (seed amber ×1.35 — it read
+   brown at pixel scale) held near full alpha.
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."
