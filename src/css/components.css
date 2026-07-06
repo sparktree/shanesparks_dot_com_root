@@ -101,11 +101,27 @@
 	right: 0;
 }
 
+/* Labels speak their territory's color (deep on light bg, bright on
+   dark — the same deep/bright convention as links). */
+.pixel-map-territory {
+	--territory-color: var(--color-link);
+}
+
+.pixel-map-territory[data-side="right"] {
+	--territory-color: #53337f; /* writings deep purple */
+}
+
+@media (prefers-color-scheme: dark) {
+	.pixel-map-territory[data-side="right"] {
+		--territory-color: #b49ce0; /* writings lavender */
+	}
+}
+
 .pixel-map-label {
 	padding: var(--space-1) var(--space-2);
 	background: var(--color-bg);
 	border: 1px solid var(--color-rule);
-	color: var(--color-link);
+	color: var(--territory-color);
 	font-family: var(--font-display);
 	font-size: var(--text-s);
 	text-decoration: underline;

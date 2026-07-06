@@ -58,9 +58,9 @@ the way music does. **Use this to resolve any design ambiguity.**
    Writings (right): body graded deep purple → vermillion, rule 150 lace flowing
    horizontally (its time axis runs like lines of text) graded lavender → sandstone.
    Each future section gets its own fractal rule, palette, and energy.
-   *Open decision:* Writings hexes are PROVISIONAL placeholders —
-   body `#53337F→#B5431C`, fractal `#B49CE0→#DFAE7E`, glint `#DFAE7E` — awaiting
-   Shane's chosen values.
+   Writings hexes confirmed by Shane (2026-07-06): body `#53337F→#B5431C`,
+   fractal `#B49CE0→#DFAE7E`, glint `#DFAE7E`. Territory labels speak their
+   section's color (deep variant on light, bright on dark).
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."
