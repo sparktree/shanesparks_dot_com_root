@@ -12,7 +12,7 @@ $PYODIDE_VERSION = "314.0.2"
 $NUMPY_WHEEL = "numpy-2.4.3-cp314-cp314-pyemscripten_2026_0_wasm32.whl"
 $NUMPY_SHA256 = "0cad9c1b91f0082e4f959bc0e0bf5835a2efbba6ab3b1e9d1fe6e7e564cca98e"
 # @huggingface/transformers is pinned exactly in package.json / package-lock.json.
-$MODEL_REPO = "Xenova/all-MiniLM-L6-v2"
+$MODEL_REPOS = @("Xenova/all-MiniLM-L6-v2", "Snowflake/snowflake-arctic-embed-xs")
 
 $root = Split-Path $PSScriptRoot -Parent
 $tmp = Join-Path $env:TEMP "vendor-work"
@@ -46,14 +46,16 @@ foreach ($f in "ort-wasm-simd-threaded.mjs","ort-wasm-simd-threaded.wasm","ort-w
 }
 
 # --- Model weights -----------------------------------------------------
-Write-Host "Vendoring $MODEL_REPO..."
-$mDest = Join-Path $root "models\$($MODEL_REPO -replace '/', '\')"
-New-Item -ItemType Directory -Force (Join-Path $mDest "onnx") | Out-Null
-$base = "https://huggingface.co/$MODEL_REPO/resolve/main"
-foreach ($f in "config.json","tokenizer.json","tokenizer_config.json","special_tokens_map.json") {
-	Invoke-WebRequest "$base/$f" -OutFile (Join-Path $mDest $f)
+foreach ($repo in $MODEL_REPOS) {
+	Write-Host "Vendoring $repo..."
+	$mDest = Join-Path $root "models\$($repo -replace '/', '\')"
+	New-Item -ItemType Directory -Force (Join-Path $mDest "onnx") | Out-Null
+	$base = "https://huggingface.co/$repo/resolve/main"
+	foreach ($f in "config.json","tokenizer.json","tokenizer_config.json","special_tokens_map.json") {
+		Invoke-WebRequest "$base/$f" -OutFile (Join-Path $mDest $f)
+	}
+	Invoke-WebRequest "$base/onnx/model_quantized.onnx" -OutFile (Join-Path $mDest "onnx\model_quantized.onnx")
 }
-Invoke-WebRequest "$base/onnx/model_quantized.onnx" -OutFile (Join-Path $mDest "onnx\model_quantized.onnx")
 
 # --- Cloudflare per-file cap check ------------------------------------
 $cap = 25MB

@@ -1,0 +1,220 @@
+---
+layout: layouts/base.njk
+title: "Demo: quantum word embeddings"
+description: Words become quantum states in your browser — amplitude encoding and SWAP tests, live, plus the real results from the research.
+---
+
+<style>
+	.q-panel {
+		border: 1px solid var(--color-rule);
+		padding: var(--space-3);
+		margin-block: var(--space-3);
+		font-family: var(--font-display);
+		font-size: var(--text-s);
+	}
+	.q-panel button,
+	.q-panel select {
+		font: inherit;
+		color: var(--color-link);
+		background: var(--color-bg);
+		border: 1px solid var(--color-fg);
+		padding: var(--space-1) var(--space-2);
+		cursor: pointer;
+	}
+	.q-panel button {
+		text-decoration: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 0.1875em;
+	}
+	.q-panel button:hover:enabled {
+		text-decoration-color: var(--color-highlight);
+	}
+	.q-panel button:disabled {
+		cursor: wait;
+		text-decoration: none;
+	}
+	.q-panel input[type="text"] {
+		font: inherit;
+		color: var(--color-fg);
+		background: var(--color-bg);
+		border: 1px solid var(--color-rule);
+		padding: var(--space-1) var(--space-2);
+		width: 100%;
+	}
+	.q-row {
+		display: flex;
+		gap: var(--space-3);
+		flex-wrap: wrap;
+		align-items: baseline;
+		margin-block: var(--space-2);
+	}
+	.q-strip,
+	#q-shotmap {
+		display: block;
+		width: 100%;
+		image-rendering: pixelated;
+		border: 1px solid var(--color-rule);
+	}
+	.q-strip {
+		height: 14px;
+	}
+	#q-shotmap {
+		min-height: 14px;
+	}
+	#q-conv,
+	#r-scatter {
+		display: block;
+		width: 100%;
+		image-rendering: pixelated;
+	}
+	.q-readouts {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+		gap: var(--space-2);
+		margin-block: var(--space-2);
+	}
+	.q-readouts div {
+		border: 1px solid var(--color-rule);
+		padding: var(--space-2);
+	}
+	.q-readouts strong {
+		display: block;
+		font-size: var(--text-l);
+	}
+	fieldset {
+		border: 1px solid var(--color-rule);
+		margin: 0;
+	}
+</style>
+
+<h1>Quantum word embeddings</h1>
+
+<p>
+	Can today's word embeddings survive the trip into a quantum computer?
+	In <em>Old Wine in New Bottles: Using Classical Word Embeddings in
+	Gate-Based Quantum NLP Systems</em> (Cavar, Parukola, Graves &amp;
+	Sparks, Indiana University, 2025), we showed that n-dimensional
+	embeddings can be packed into just log<sub>2</sub>(n) qubits — or
+	log<sub>2</sub>(n/2) by folding pairs of dimensions into complex
+	amplitudes — and that word similarity survives the encoding nearly
+	intact. This page runs that pipeline <strong>live in your
+	browser</strong>, then lets you explore the actual experimental data.
+</p>
+
+<h2>The pipeline, live</h2>
+
+<p class="post-meta">
+	Runs entirely in your browser — nothing is installed, and nothing you
+	type leaves this page. The SWAP test is simulated exactly: the ancilla
+	measures 1 with probability (1 − |⟨a|b⟩|²)/2, and real Bernoulli shots
+	are drawn from it — the same statistics an ideal statevector simulator
+	produces.
+</p>
+
+<div class="q-panel">
+	<div class="q-row">
+		<label>embedding model
+			<select id="q-model">
+				<option value="minilm">all-MiniLM-L6-v2 (2021)</option>
+				<option value="arctic">snowflake-arctic-embed-xs (2024)</option>
+			</select>
+		</label>
+		<button id="q-load">Load demo (~22 MB)</button>
+		<span id="q-status" role="status" aria-live="polite"></span>
+	</div>
+
+	<div id="q-io" hidden>
+		<div class="q-row">
+			<label style="flex:1">word or phrase A
+				<input type="text" id="q-word-a" value="cat">
+			</label>
+			<label style="flex:1">word or phrase B
+				<input type="text" id="q-word-b" value="dog">
+			</label>
+		</div>
+		<div class="q-row">
+			<fieldset>
+				<legend>amplitude encoding</legend>
+				<label><input type="radio" name="q-enc" value="real" checked> real</label>
+				<label><input type="radio" name="q-enc" value="cint"> complex, interdigitated</label>
+				<label><input type="radio" name="q-enc" value="chalf"> complex, halves</label>
+			</fieldset>
+			<label>shots
+				<select id="q-shots">
+					<option>100</option>
+					<option selected>1000</option>
+					<option>10000</option>
+				</select>
+			</label>
+			<button id="q-run" disabled>Run SWAP test</button>
+		</div>
+
+		<p id="q-stats" class="post-meta"></p>
+
+		<p>state |a⟩ — one pixel per amplitude (sign as color when real; phase as hue when complex):</p>
+		<canvas class="q-strip" id="q-strip-a"></canvas>
+		<p>state |b⟩:</p>
+		<canvas class="q-strip" id="q-strip-b"></canvas>
+
+		<p>every measurement is one pixel — ancilla 0 in cyan, 1 in amber:</p>
+		<canvas id="q-shotmap"></canvas>
+
+		<p>the estimate converging on the exact fidelity (cyan line), with its shrinking 95% interval:</p>
+		<canvas id="q-conv"></canvas>
+
+		<div class="q-readouts">
+			<div>classical cosine <strong id="q-cos">—</strong></div>
+			<div>cosine² <strong id="q-cos2">—</strong></div>
+			<div>exact |⟨a|b⟩|² <strong id="q-fid">—</strong></div>
+			<div>SWAP estimate <strong id="q-est">—</strong></div>
+		</div>
+	</div>
+</div>
+
+<h2>The research data</h2>
+
+<p>
+	The paper's experiments: <span id="r-n">666</span> noun pairs from
+	SimLex-999, embedded with GPT and VoyageAI models, amplitude-encoded,
+	and measured with SWAP tests on a quantum simulator. Every point below
+	is one word pair from those runs.
+</p>
+
+<div class="q-panel">
+	<div class="q-row">
+		<label>comparison
+			<select id="r-comp">
+				<option value="q_real_vs_cos">quantum (real) vs classical</option>
+				<option value="q_cint_vs_cos">quantum (complex) vs classical</option>
+				<option value="cos_vs_simlex">classical vs human</option>
+				<option value="q_real_vs_simlex">quantum vs human</option>
+			</select>
+		</label>
+		<label>model
+			<select id="r-model"></select>
+		</label>
+		<span id="r-rho"></span>
+	</div>
+	<canvas id="r-scatter"></canvas>
+	<p class="post-meta" id="r-pair">hover a point to identify its word pair</p>
+</div>
+
+<h2>Notes</h2>
+
+<ul>
+	<li>Live embeddings use small in-browser models; the paper's
+		experiments used GPT and VoyageAI embeddings via API. The 2026
+		state-of-the-art on-device embedding models (EmbeddingGemma-300m,
+		Qwen3-Embedding) ship weights as single files far above the 25 MiB
+		per-file limit of this site's host — the two models offered here are
+		the strongest that physics <em>and</em> static hosting allow.</li>
+	<li>Complex encodings halve the qubit count and state-preparation
+		gates — the paper's central practical argument. Toggle the encoding
+		above and watch the amplitude count and qubit readouts change.</li>
+	<li>Based on joint work with Damir Cavar, Koushik Reddy Parukola, and
+		James Bryan Graves (Indiana University); supported by the Center for
+		Quantum Technologies (NSF #2224928). Code and data:
+		<a href="https://github.com/dcavar/nlqk">NLQK</a>.</li>
+</ul>
+
+<script type="module" src="/js/qnlp-demo.js"></script>
