@@ -46,19 +46,23 @@
    The whole area is one link; the label is real text on a bg plate so
    it never sits on the cyans or amber. */
 
+/* Full-bleed: the map escapes the prose measure and spans the screen. */
 .map-stage {
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
 	min-height: calc(100svh - 16rem);
 	display: grid;
 	place-items: center;
 	align-content: center;
 	gap: var(--space-4);
+	overflow-x: clip;
 }
 
 .pixel-map {
 	position: relative;
 	display: block;
-	width: min(88vw, 32rem);
-	aspect-ratio: 1;
+	width: min(92vw, 56rem);
+	aspect-ratio: 2 / 1;
 	/* No-JS fallback: a quantized checker stands in for the web. */
 	background-image: repeating-conic-gradient(
 		var(--color-rule) 0% 25%,

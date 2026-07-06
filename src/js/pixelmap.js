@@ -1,11 +1,11 @@
 /* pixelmap.js — the homepage map, v0.
-   A pixel web grown from a seeded cellular automaton, rendered at grid
+   A pixel field grown from a seeded cellular automaton, rendered at grid
    resolution and upscaled so the pixels stay visible (truth to medium:
    the structure is genuinely computed, not painted). One region for now
    (Projects); REGION GEOMETRY below is the extension point when the map
    gains subsections.
-   Pixels are a mixture of the two cyan seeds, with amber glints in the
-   dense cores — per Shane, identical in both schemes. */
+   Per Shane: a dense horizontal oval — cyans primary, amber/gold
+   secondary — identical in both schemes. */
 (() => {
 	"use strict";
 
@@ -15,9 +15,10 @@
 	if (!canvas) return;
 	const ctx = canvas.getContext("2d");
 
-	const SIZE = 128; // CA grid; one cell = one rendered pixel
-	canvas.width = SIZE;
-	canvas.height = SIZE;
+	const W = 192; // CA grid; one cell = one rendered pixel
+	const H = 96;
+	canvas.width = W;
+	canvas.height = H;
 	host.classList.add("is-grown"); // drops the no-JS fallback pattern
 
 	const CYAN_DEEP = "#005a78";
@@ -26,7 +27,7 @@
 	   so glints use it brightened ~1.35x (Shane, 2026-07-06). */
 	const AMBER_GLINT = "#e69800";
 
-	/* Deterministic PRNG (mulberry32) — the web is designed, not random:
+	/* Deterministic PRNG (mulberry32) — the field is designed, not random:
 	   the same structure grows on every visit. */
 	function mulberry32(a) {
 		return function () {
@@ -40,28 +41,29 @@
 	const rand = mulberry32(0x5eed);
 
 	/* --- REGION GEOMETRY (extension point) ------------------------------
-	   Seed probability field: a filled disc, patterned by angular lobes
-	   interfering with a spiral ripple — populated throughout, denser
-	   and sparser in waves, with a soft organic boundary. Future
-	   subsections get their own sectors / fields and colors here. */
-	let grid = new Uint8Array(SIZE * SIZE);
-	const c = SIZE / 2;
-	for (let y = 0; y < SIZE; y++) {
-		for (let x = 0; x < SIZE; x++) {
-			const dx = x - c;
-			const dy = y - c;
-			const r = Math.hypot(dx, dy) / c;
-			const a = Math.atan2(dy, dx);
-			const edge = 1 / (1 + Math.exp((r - 0.92) / 0.03));
-			const lobes = 0.28 * Math.sin(a * 3 + 1.7) * Math.sin(a * 5 - 0.4);
-			const ripple = 0.22 * Math.cos(r * 14 - a * 2);
-			if (rand() < edge * (0.52 + lobes + ripple) * 0.92) grid[y * SIZE + x] = 1;
+	   Seed probability field: a dense horizontal ellipse with a soft
+	   organic boundary; angular lobes and a spiral ripple leave faint
+	   pores and texture in an otherwise filled body. Future subsections
+	   get their own sectors / fields and colors here. */
+	let grid = new Uint8Array(W * H);
+	const cx = W / 2;
+	const cy = H / 2;
+	for (let y = 0; y < H; y++) {
+		for (let x = 0; x < W; x++) {
+			const nx = (x - cx) / (W / 2); // elliptical normalization
+			const ny = (y - cy) / (H / 2);
+			const r = Math.hypot(nx, ny);
+			const a = Math.atan2(ny, nx);
+			const edge = 1 / (1 + Math.exp((r - 0.9) / 0.035));
+			const lobes = 0.14 * Math.sin(a * 3 + 1.7) * Math.sin(a * 5 - 0.4);
+			const ripple = 0.12 * Math.cos(r * 14 - a * 2);
+			if (rand() < edge * (0.78 + lobes + ripple)) grid[y * W + x] = 1;
 		}
 	}
 
 	/* Grow: a few generations of a clumping life-like rule
 	   (survive on 3+, born on 5+ of 8 neighbors, toroidal). */
-	const at = (x, y) => ((y + SIZE) % SIZE) * SIZE + ((x + SIZE) % SIZE);
+	const at = (x, y) => ((y + H) % H) * W + ((x + W) % W);
 	function neighbors(g, x, y) {
 		let n = 0;
 		for (let j = -1; j <= 1; j++)
@@ -69,25 +71,25 @@
 		return n;
 	}
 	for (let step = 0; step < 4; step++) {
-		const next = new Uint8Array(SIZE * SIZE);
-		for (let y = 0; y < SIZE; y++)
-			for (let x = 0; x < SIZE; x++) {
+		const next = new Uint8Array(W * H);
+		for (let y = 0; y < H; y++)
+			for (let x = 0; x < W; x++) {
 				const n = neighbors(grid, x, y);
-				next[y * SIZE + x] = grid[y * SIZE + x] ? (n >= 3 ? 1 : 0) : n >= 5 ? 1 : 0;
+				next[y * W + x] = grid[y * W + x] ? (n >= 3 ? 1 : 0) : n >= 5 ? 1 : 0;
 			}
 		grid = next;
 	}
 
-	/* Cells: the web is a mixture of the two cyans; dense cores glint
-	   amber. Alpha is quantized — depth, not blur. Glints stay near
+	/* Cells: cyans are primary; sparse amber glints in dense cores are
+	   secondary. Alpha is quantized — depth, not blur. Glints stay near
 	   full strength so they read gold, never muddy. */
 	const ALPHAS = [0.45, 0.72, 1];
 	const cells = [];
-	for (let y = 0; y < SIZE; y++)
-		for (let x = 0; x < SIZE; x++) {
-			if (!grid[y * SIZE + x]) continue;
+	for (let y = 0; y < H; y++)
+		for (let x = 0; x < W; x++) {
+			if (!grid[y * W + x]) continue;
 			const n = neighbors(grid, x, y);
-			if (n >= 6 && rand() < 0.35) {
+			if (n >= 6 && rand() < 0.13) {
 				cells.push({ x, y, color: AMBER_GLINT, a: rand() < 0.5 ? 0.85 : 1 });
 			} else {
 				const color = rand() < 0.55 ? CYAN_DEEP : CYAN_BRIGHT;
@@ -96,14 +98,14 @@
 		}
 
 	/* Pointer reaction: cells near the cursor are pushed outward and
-	   spring back — the web shifts around the visitor's presence. */
+	   spring back — the field shifts around the visitor's presence. */
 	const ox = new Float32Array(cells.length);
 	const oy = new Float32Array(cells.length);
 	let pointer = null;
 	let raf = 0;
 
 	function draw() {
-		ctx.clearRect(0, 0, SIZE, SIZE);
+		ctx.clearRect(0, 0, W, H);
 		for (let i = 0; i < cells.length; i++) {
 			const cell = cells[i];
 			ctx.globalAlpha = cell.a;
@@ -140,8 +142,8 @@
 	function toGrid(e) {
 		const b = canvas.getBoundingClientRect();
 		return {
-			x: ((e.clientX - b.left) / b.width) * SIZE,
-			y: ((e.clientY - b.top) / b.height) * SIZE,
+			x: ((e.clientX - b.left) / b.width) * W,
+			y: ((e.clientY - b.top) / b.height) * H,
 		};
 	}
 

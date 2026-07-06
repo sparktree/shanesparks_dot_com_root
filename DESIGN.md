@@ -36,9 +36,13 @@ the way music does. **Use this to resolve any design ambiguity.**
    fallback is a quantized checker with the label link still functional. Structure
    is the deliverable — visual tuning and subsections are placeholders for Shane.
    *Revised per Shane (2026-07-06):* the field is a filled, patterned disc (angular
-   lobes × spiral ripple, soft boundary) at 128×128 rather than a perimeter ring;
+   lobes × spiral ripple, soft boundary) rather than a perimeter ring;
    glints use a map-local brightened amber `#E69800` (seed amber ×1.35 — it read
    brown at pixel scale) held near full alpha.
+   *Revised again per Shane (2026-07-06):* a dense horizontal ellipse (192×96 grid,
+   2:1, full-bleed across the screen, ~79% of the ellipse filled — very little empty
+   space, faint pores/texture remaining); cyans primary, amber/gold secondary
+   (glint probability cut to 0.13 from 0.35).
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."
