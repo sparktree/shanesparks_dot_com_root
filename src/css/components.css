@@ -41,6 +41,75 @@
 	text-underline-offset: 0.1875em;
 }
 
+/* --- The map --------------------------------------------------------
+   Homepage centerpiece: a CA-grown pixel web (see js/pixelmap.js).
+   The whole area is one link; the label is real text on a bg plate so
+   it never sits on the cyans or amber. */
+
+.map-stage {
+	min-height: calc(100svh - 16rem);
+	display: grid;
+	place-items: center;
+	align-content: center;
+	gap: var(--space-4);
+}
+
+.pixel-map {
+	position: relative;
+	display: block;
+	width: min(80vw, 26rem);
+	aspect-ratio: 1;
+	/* No-JS fallback: a quantized checker stands in for the web. */
+	background-image: repeating-conic-gradient(
+		var(--color-rule) 0% 25%,
+		transparent 0% 50%
+	);
+	background-size: 8px 8px;
+}
+
+.pixel-map.is-grown {
+	background-image: none;
+}
+
+.pixel-map canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	image-rendering: pixelated;
+}
+
+.pixel-map-label {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: var(--space-1) var(--space-2);
+	background: var(--color-bg);
+	border: 1px solid var(--color-rule);
+	color: var(--color-link);
+	font-family: var(--font-display);
+	font-size: var(--text-s);
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.1875em;
+}
+
+.pixel-map:hover .pixel-map-label {
+	text-decoration-color: var(--color-highlight);
+}
+
+.pixel-map:focus-visible {
+	outline: 2px solid var(--color-link);
+	outline-offset: 4px;
+}
+
+.map-tagline {
+	font-family: var(--font-display);
+	font-size: var(--text-s);
+	text-align: center;
+	margin: 0;
+}
+
 /* Footer text is full fg — non-link text is never a mixed/muted color;
    de-emphasis comes from size and the display face alone. */
 .site-footer {

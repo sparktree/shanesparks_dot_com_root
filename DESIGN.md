@@ -28,6 +28,13 @@ the way music does. **Use this to resolve any design ambiguity.**
    section (projects, writings, music, …) carry assigned patterns and colors that bleed
    into one another across a gradient. Element positions to be decided later; this is
    the standing framework for layout development.
+   *Implemented v0 (2026-07-06):* homepage centerpiece grown from a seeded cellular
+   automaton (`src/js/pixelmap.js`), one region (Projects), whole area links to
+   `/projects/` with a real-text label; pixels are a mixture of the two cyans with
+   amber glints in dense cores (Shane's spec), identical in both schemes; pointer
+   proximity displaces cells with spring-back, disabled under reduced-motion; no-JS
+   fallback is a quantized checker with the label link still functional. Structure
+   is the deliverable — visual tuning and subsections are placeholders for Shane.
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."

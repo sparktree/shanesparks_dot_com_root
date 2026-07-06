@@ -1,0 +1,154 @@
+/* pixelmap.js — the homepage map, v0.
+   A pixel web grown from a seeded cellular automaton, rendered at grid
+   resolution and upscaled so the pixels stay visible (truth to medium:
+   the structure is genuinely computed, not painted). One region for now
+   (Projects); REGION GEOMETRY below is the extension point when the map
+   gains subsections.
+   Pixels are a mixture of the two cyan seeds, with amber glints in the
+   dense cores — per Shane, identical in both schemes. */
+(() => {
+	"use strict";
+
+	const host = document.querySelector("[data-pixel-map]");
+	if (!host) return;
+	const canvas = host.querySelector("canvas");
+	if (!canvas) return;
+	const ctx = canvas.getContext("2d");
+
+	const SIZE = 96; // CA grid; one cell = one rendered pixel
+	canvas.width = SIZE;
+	canvas.height = SIZE;
+	host.classList.add("is-grown"); // drops the no-JS fallback pattern
+
+	const CYAN_DEEP = "#005a78";
+	const CYAN_BRIGHT = "#75d1d9";
+	const AMBER = "#ab7100";
+
+	/* Deterministic PRNG (mulberry32) — the web is designed, not random:
+	   the same structure grows on every visit. */
+	function mulberry32(a) {
+		return function () {
+			a |= 0;
+			a = (a + 0x6d2b79f5) | 0;
+			let t = Math.imul(a ^ (a >>> 15), 1 | a);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+	const rand = mulberry32(0x5eed);
+
+	/* --- REGION GEOMETRY (extension point) ------------------------------
+	   Seed probability field: an asymmetric annular web with angular
+	   lobes and a faint core. Future subsections get their own angular
+	   sectors / probability fields and color assignments here. */
+	let grid = new Uint8Array(SIZE * SIZE);
+	const c = SIZE / 2;
+	for (let y = 0; y < SIZE; y++) {
+		for (let x = 0; x < SIZE; x++) {
+			const dx = x - c;
+			const dy = y - c;
+			const r = Math.hypot(dx, dy) / c;
+			const a = Math.atan2(dy, dx);
+			const band = Math.exp(-((r - 0.62) ** 2) / 0.035);
+			const lobes = 0.6 + 0.4 * Math.sin(a * 3 + 1.7) * Math.sin(a * 5 - 0.4);
+			const core = 0.5 * Math.exp(-(r * r) / 0.02);
+			if (rand() < band * lobes * 0.95 + core) grid[y * SIZE + x] = 1;
+		}
+	}
+
+	/* Grow: a few generations of a clumping life-like rule
+	   (survive on 3+, born on 5+ of 8 neighbors, toroidal). */
+	const at = (x, y) => ((y + SIZE) % SIZE) * SIZE + ((x + SIZE) % SIZE);
+	function neighbors(g, x, y) {
+		let n = 0;
+		for (let j = -1; j <= 1; j++)
+			for (let i = -1; i <= 1; i++) if (i || j) n += g[at(x + i, y + j)];
+		return n;
+	}
+	for (let step = 0; step < 4; step++) {
+		const next = new Uint8Array(SIZE * SIZE);
+		for (let y = 0; y < SIZE; y++)
+			for (let x = 0; x < SIZE; x++) {
+				const n = neighbors(grid, x, y);
+				next[y * SIZE + x] = grid[y * SIZE + x] ? (n >= 3 ? 1 : 0) : n >= 5 ? 1 : 0;
+			}
+		grid = next;
+	}
+
+	/* Cells: the web is a mixture of the two cyans; dense cores glint
+	   amber. Alpha is quantized to three levels — depth, not blur. */
+	const ALPHAS = [0.45, 0.72, 1];
+	const cells = [];
+	for (let y = 0; y < SIZE; y++)
+		for (let x = 0; x < SIZE; x++) {
+			if (!grid[y * SIZE + x]) continue;
+			const n = neighbors(grid, x, y);
+			let color;
+			if (n >= 6 && rand() < 0.35) color = AMBER;
+			else color = rand() < 0.55 ? CYAN_DEEP : CYAN_BRIGHT;
+			cells.push({ x, y, color, a: ALPHAS[Math.floor(rand() * 3)] });
+		}
+
+	/* Pointer reaction: cells near the cursor are pushed outward and
+	   spring back — the web shifts around the visitor's presence. */
+	const ox = new Float32Array(cells.length);
+	const oy = new Float32Array(cells.length);
+	let pointer = null;
+	let raf = 0;
+
+	function draw() {
+		ctx.clearRect(0, 0, SIZE, SIZE);
+		for (let i = 0; i < cells.length; i++) {
+			const cell = cells[i];
+			ctx.globalAlpha = cell.a;
+			ctx.fillStyle = cell.color;
+			ctx.fillRect(Math.round(cell.x + ox[i]), Math.round(cell.y + oy[i]), 1, 1);
+		}
+		ctx.globalAlpha = 1;
+	}
+
+	function tick() {
+		const R = 14; // influence radius, in grid cells
+		let settled = true;
+		for (let i = 0; i < cells.length; i++) {
+			let tx = 0;
+			let ty = 0;
+			if (pointer) {
+				const dx = cells[i].x - pointer.x;
+				const dy = cells[i].y - pointer.y;
+				const d = Math.hypot(dx, dy);
+				if (d < R && d > 0.001) {
+					const f = (1 - d / R) * 4;
+					tx = (dx / d) * f;
+					ty = (dy / d) * f;
+				}
+			}
+			ox[i] += (tx - ox[i]) * 0.18;
+			oy[i] += (ty - oy[i]) * 0.18;
+			if (Math.abs(ox[i]) > 0.05 || Math.abs(oy[i]) > 0.05) settled = false;
+		}
+		draw();
+		raf = pointer || !settled ? requestAnimationFrame(tick) : 0;
+	}
+
+	function toGrid(e) {
+		const b = canvas.getBoundingClientRect();
+		return {
+			x: ((e.clientX - b.left) / b.width) * SIZE,
+			y: ((e.clientY - b.top) / b.height) * SIZE,
+		};
+	}
+
+	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		host.addEventListener("pointermove", (e) => {
+			pointer = toGrid(e);
+			if (!raf) raf = requestAnimationFrame(tick);
+		});
+		host.addEventListener("pointerleave", () => {
+			pointer = null;
+			if (!raf) raf = requestAnimationFrame(tick);
+		});
+	}
+
+	draw();
+})();
