@@ -1,0 +1,16 @@
+{
+  "name": "shanesparks-dot-com",
+  "private": true,
+  "type": "module",
+  "description": "Source for shanesparks.com — a fully static, self-contained personal site. See PLAN.md.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "eleventy",
+    "serve": "eleventy --serve"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "3.1.6"
+  }
+}

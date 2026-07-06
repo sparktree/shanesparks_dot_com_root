@@ -1,0 +1,57 @@
+/* ============================================================
+   base.css — element defaults and reading rhythm
+   PLACEHOLDER styling; see tokens.css. Phase 1 replaces this
+   with the hand-built design system.
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0 auto;
+	padding: var(--space-3);
+	max-width: var(--measure);
+	background: var(--color-bg);
+	color: var(--color-text);
+	font-family: var(--font-body);
+	font-size: var(--font-size-base);
+	line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+	line-height: 1.2;
+	margin-block: var(--space-4) var(--space-2);
+}
+
+a {
+	color: var(--color-accent);
+}
+
+a:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+code,
+pre {
+	font-family: var(--font-mono);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}

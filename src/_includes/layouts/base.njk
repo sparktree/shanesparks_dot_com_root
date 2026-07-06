@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="{{ site.language }}">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{% if title %}{{ title }} · {% endif %}{{ site.title }}</title>
+	<meta name="description" content="{{ description or site.description }}">
+	<link rel="stylesheet" href="/css/tokens.css">
+	<link rel="stylesheet" href="/css/base.css">
+	<link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+	<header class="site-header">
+		<a class="site-title" href="/">{{ site.title }}</a>
+		<nav class="site-nav" aria-label="Site">
+			<a href="/">Home</a>
+		</nav>
+	</header>
+
+	<main id="main">
+		{{ content | safe }}
+	</main>
+
+	<footer class="site-footer">
+		<p>© {{ site.author }}. Built by hand; served as plain files; no trackers.</p>
+	</footer>
+</body>
+</html>
