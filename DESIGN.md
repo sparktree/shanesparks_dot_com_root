@@ -43,11 +43,14 @@ the way music does. **Use this to resolve any design ambiguity.**
    2:1, full-bleed across the screen — very little empty space, faint pores/texture
    remaining); cyans primary, amber/gold secondary (glint probability cut to 0.13
    from 0.35).
-   *Fractal layer per Shane (2026-07-06):* Fredkin's replicator rule (B1357/S1357,
-   the fractal-generating Life variant) evolved 63 steps from two offset mirrored
-   motifs produces a Sierpinski interference lattice, rendered bright over the dense
-   base (base seed probability eased to 0.68 to let it read). Base alpha floor raised
-   0.45 → 0.65 so no region reads dull.
+   *Fractal layer per Shane (2026-07-06):* rule 90 — the canonical fractal CA —
+   cascades nested Sierpinski triangles down the field from a sparse initial line,
+   grown at half resolution so each fractal cell is a bold 2×2 block. Lesson from
+   the first (Fredkin replicator) attempt: the lattice was camouflaged because
+   bright cyan appeared in both layers; now the base body is deep cyan alone and
+   bright cyan belongs exclusively to the fractal (rare gold blocks within it).
+   Base seed probability eased to 0.68; base alpha floor raised 0.45 → 0.65 so no
+   region reads dull.
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."

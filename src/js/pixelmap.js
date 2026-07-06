@@ -5,8 +5,8 @@
    (Projects); REGION GEOMETRY below is the extension point when the map
    gains subsections.
    Per Shane: a dense horizontal oval — cyans primary, amber/gold
-   secondary — identical in both schemes, with a genuine fractal lattice
-   (Fredkin replicator interference) woven through the body. */
+   secondary — identical in both schemes, with a genuine fractal
+   (rule 90 Sierpinski cascade) woven bright through a deep-cyan body. */
 (() => {
 	"use strict";
 
@@ -82,26 +82,33 @@
 	}
 
 	/* --- Fractal layer ---------------------------------------------------
-	   Fredkin's replicator (B1357/S1357: a cell lives iff it has an odd
-	   number of neighbors) — the classic fractal-generating Life-family
-	   rule. Two small seed motifs (one mirrored, offset so their XOR
-	   interference doesn't cancel) evolved 63 steps: XOR rules reach
-	   maximal Sierpinski interference just below powers of two. */
-	let fractal = new Uint8Array(W * H);
-	const MOTIF_A = [[0, 0], [1, 0], [2, 0], [0, 1], [1, 2]];
-	const MOTIF_B = [[0, 0], [-1, 0], [-2, 0], [0, 1], [-1, 2]];
-	for (const [mx, my] of MOTIF_A) fractal[at(48 + mx, 28 + my)] = 1;
-	for (const [mx, my] of MOTIF_B) fractal[at(144 + mx, 68 + my)] = 1;
-	for (let step = 0; step < 63; step++) {
-		const next = new Uint8Array(W * H);
-		for (let y = 0; y < H; y++)
-			for (let x = 0; x < W; x++) next[y * W + x] = neighbors(fractal, x, y) % 2;
-		fractal = next;
-	}
+	   Rule 90 — the canonical fractal cellular automaton: each cell is
+	   the XOR of its two diagonal ancestors, so a sparse initial line
+	   cascades down the field as nested Sierpinski triangles. Grown at
+	   half resolution (one fractal cell = a 2x2 pixel block) so the
+	   triangles read large and unmistakable. Its own PRNG keeps the
+	   fractal independent of base-field tuning. */
+	const FW = W / 2;
+	const FH = H / 2;
+	const frand = mulberry32(0xf7ac7a1);
+	const fractal = new Uint8Array(FW * FH);
+	for (let x = 0; x < FW; x++) if (frand() < 0.05) fractal[x] = 1;
+	for (let y = 1; y < FH; y++)
+		for (let x = 0; x < FW; x++)
+			fractal[y * FW + x] =
+				fractal[(y - 1) * FW + ((x + FW - 1) % FW)] ^
+				fractal[(y - 1) * FW + ((x + 1) % FW)];
 
-	/* Cells: the fractal lattice renders bright atop the dense base —
-	   cyans primary, amber/gold secondary. Alpha is quantized and floors
-	   high so no region reads dull. */
+	/* Per-fractal-cell color so each 2x2 block is uniform and crisp:
+	   bright cyan with rare gold. */
+	const fcolor = new Array(FW * FH);
+	for (let i = 0; i < FW * FH; i++)
+		if (fractal[i]) fcolor[i] = frand() < 0.08 ? AMBER_GLINT : CYAN_BRIGHT;
+
+	/* Cells: the base body is deep cyan alone — bright cyan belongs to
+	   the fractal layer, so the lattice actually reads against the
+	   field (mixing bright into the base camouflaged it). Alpha is
+	   quantized and floors high so no region reads dull. */
 	const BASE_ALPHAS = [0.65, 0.85, 1];
 	const cells = [];
 	for (let y = 0; y < H; y++)
@@ -109,17 +116,15 @@
 			const nx = (x - cx) / (W / 2);
 			const ny = (y - cy) / (H / 2);
 			const inField = Math.hypot(nx, ny) < 0.95;
-			if (fractal[y * W + x] && inField) {
-				const roll = rand();
-				const color = roll < 0.62 ? CYAN_BRIGHT : roll < 0.9 ? CYAN_DEEP : AMBER_GLINT;
-				cells.push({ x, y, color, a: rand() < 0.5 ? 0.85 : 1 });
+			const fi = (y >> 1) * FW + (x >> 1);
+			if (fractal[fi] && inField) {
+				cells.push({ x, y, color: fcolor[fi], a: 1 });
 			} else if (grid[y * W + x]) {
 				const n = neighbors(grid, x, y);
 				if (n >= 6 && rand() < 0.13) {
 					cells.push({ x, y, color: AMBER_GLINT, a: rand() < 0.5 ? 0.85 : 1 });
 				} else {
-					const color = rand() < 0.55 ? CYAN_DEEP : CYAN_BRIGHT;
-					cells.push({ x, y, color, a: BASE_ALPHAS[Math.floor(rand() * 3)] });
+					cells.push({ x, y, color: CYAN_DEEP, a: BASE_ALPHAS[Math.floor(rand() * 3)] });
 				}
 			}
 		}
