@@ -5,6 +5,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>{% if title %}{{ title }} · {% endif %}{{ site.title }}</title>
 	<meta name="description" content="{{ description or site.description }}">
+	<link rel="canonical" href="{{ site.url }}{{ page.url }}">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="{{ site.title }}">
+	<meta property="og:title" content="{{ title or site.title }}">
+	<meta property="og:description" content="{{ description or site.description }}">
+	<meta property="og:url" content="{{ site.url }}{{ page.url }}">
+	<meta name="twitter:card" content="summary">
+	<link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="/feed.xml">
 	<link rel="preload" href="/fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="/fonts/SpaceGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="stylesheet" href="/css/tokens.css">
@@ -17,8 +25,8 @@
 		<nav class="site-nav" aria-label="Site">
 			<a href="/"{% if page.url == "/" %} aria-current="page"{% endif %}>Home</a>
 			<a href="/projects/"{% if page.url == "/projects/" %} aria-current="page"{% endif %}>Projects</a>
-			<a href="/writings/"{% if page.url == "/writings/" %} aria-current="page"{% endif %}>Writings</a>
-			<a href="/styleguide/"{% if page.url == "/styleguide/" %} aria-current="page"{% endif %}>Styleguide</a>
+			<a href="/writings/"{% if "/writings/" in page.url %} aria-current="page"{% endif %}>Writings</a>
+			<a href="/about/"{% if page.url == "/about/" %} aria-current="page"{% endif %}>About</a>
 		</nav>
 	</header>
 
@@ -27,6 +35,12 @@
 	</main>
 
 	<footer class="site-footer">
+		<nav class="footer-nav" aria-label="Meta">
+			<a href="/colophon/">Colophon</a>
+			<a href="/styleguide/">Styleguide</a>
+			<a href="/contact/">Contact</a>
+			<a href="/feed.xml">Feed</a>
+		</nav>
 		<p>© {{ site.author }}. Built by hand; served as plain files; no trackers.</p>
 	</footer>
 </body>
