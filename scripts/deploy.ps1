@@ -43,7 +43,7 @@ New-Item -ItemType File (Join-Path $tmp ".nojekyll") | Out-Null
 # Set-Content (Join-Path $tmp "CNAME") "mirror.shanesparks.com"
 git -C $tmp init -b gh-pages -q
 git -C $tmp add -A
-git -C $tmp -c user.name="Shane Sparks" -c user.email="sparksashane@gmail.com" commit -q -m "Deploy $sha"
+git -C $tmp -c user.name="Shane Sparks" -c user.email="sparktree@users.noreply.github.com" commit -q -m "Deploy $sha"
 git -C $tmp push --force $origin gh-pages
 Remove-Item $tmp -Recurse -Force
 Write-Host "`nDone: Cloudflare + GitHub Pages mirror deployed from commit $sha."

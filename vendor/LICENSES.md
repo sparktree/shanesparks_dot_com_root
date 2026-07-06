@@ -14,6 +14,6 @@ under its own license; source is available at the linked upstreams.
 | Departure Mono (in `/src/fonts`) | 1.500 | OFL-1.1 (included alongside) | https://github.com/rektdeckard/departure-mono |
 | Space Grotesk (in `/src/fonts`) | 2.0.0 | OFL-1.1 (included alongside) | https://github.com/floriankarsten/space-grotesk |
 
-Everything else in this repository — site code, design, and content — is by
-Shane Sparks. Its license is stated in the repository root (or, absent a
-LICENSE file, all rights reserved).
+Everything else in this repository is by Shane Sparks — see
+[LICENSE.md](../LICENSE.md) in the repository root: code under MIT, written
+content and imagery all rights reserved.

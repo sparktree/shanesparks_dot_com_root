@@ -1,7 +1,9 @@
 # shanesparks.com
 
 Source for a fully static, self-contained personal site. Architecture, values, and the
-phase-by-phase roadmap live in [PLAN.md](PLAN.md).
+phase-by-phase roadmap live in [PLAN.md](PLAN.md). Code is MIT; writings and imagery
+are all rights reserved; vendored runtimes keep their upstream licenses — see
+[LICENSE.md](LICENSE.md).
 
 ## Build
 
