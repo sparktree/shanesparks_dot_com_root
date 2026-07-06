@@ -38,7 +38,10 @@ Write-Host "Vendoring Transformers.js from node_modules..."
 $tfDest = Join-Path $root "vendor\transformers"
 New-Item -ItemType Directory -Force (Join-Path $tfDest "onnx") | Out-Null
 Copy-Item (Join-Path $root "node_modules\@huggingface\transformers\dist\transformers.min.js") (Join-Path $tfDest "transformers.min.js") -Force
-foreach ($f in "ort-wasm-simd-threaded.mjs","ort-wasm-simd-threaded.wasm","ort-wasm-simd-threaded.jsep.mjs","ort-wasm-simd-threaded.jsep.wasm") {
+# All four runtime variants: the browser-dependent resolution logic may
+# pick any of plain / jsep / asyncify / jspi — vendor them all so no
+# path ever leaves our origin.
+foreach ($f in "ort-wasm-simd-threaded.mjs","ort-wasm-simd-threaded.wasm","ort-wasm-simd-threaded.jsep.mjs","ort-wasm-simd-threaded.jsep.wasm","ort-wasm-simd-threaded.asyncify.mjs","ort-wasm-simd-threaded.asyncify.wasm","ort-wasm-simd-threaded.jspi.mjs","ort-wasm-simd-threaded.jspi.wasm") {
 	Copy-Item (Join-Path $root "node_modules\onnxruntime-web\dist\$f") (Join-Path $tfDest "onnx\$f") -Force
 }
 
