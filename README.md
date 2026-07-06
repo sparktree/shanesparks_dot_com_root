@@ -13,6 +13,15 @@ npm run build   # emit the deployable site to _site/
 npm run serve   # local dev server with live reload
 ```
 
+Runtime assets for the demos (Pyodide, Transformers.js, ONNX runtime, model
+weights) are committed under `vendor/` and `models/` and served from our own
+origin — the demos make zero third-party requests. To re-vendor (pinned
+versions live at the top of the script):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\vendor.ps1
+```
+
 The deployed artifact is the `_site/` folder — plain HTML/CSS/JS that works on any
 web server, e.g. `python -m http.server -d _site`.
 

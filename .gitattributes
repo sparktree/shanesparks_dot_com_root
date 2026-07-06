@@ -4,3 +4,5 @@
 *.woff2 binary
 *.wasm binary
 *.onnx binary
+*.whl binary
+*.zip binary
