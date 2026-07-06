@@ -40,9 +40,14 @@ the way music does. **Use this to resolve any design ambiguity.**
    glints use a map-local brightened amber `#E69800` (seed amber ×1.35 — it read
    brown at pixel scale) held near full alpha.
    *Revised again per Shane (2026-07-06):* a dense horizontal ellipse (192×96 grid,
-   2:1, full-bleed across the screen, ~79% of the ellipse filled — very little empty
-   space, faint pores/texture remaining); cyans primary, amber/gold secondary
-   (glint probability cut to 0.13 from 0.35).
+   2:1, full-bleed across the screen — very little empty space, faint pores/texture
+   remaining); cyans primary, amber/gold secondary (glint probability cut to 0.13
+   from 0.35).
+   *Fractal layer per Shane (2026-07-06):* Fredkin's replicator rule (B1357/S1357,
+   the fractal-generating Life variant) evolved 63 steps from two offset mirrored
+   motifs produces a Sierpinski interference lattice, rendered bright over the dense
+   base (base seed probability eased to 0.68 to let it read). Base alpha floor raised
+   0.45 → 0.65 so no region reads dull.
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."
