@@ -1,0 +1,32 @@
+# DNS zone plan for shanesparks.com — the resurrection record.
+# The domain is the single irreplaceable asset: registrar 2FA on,
+# auto-renew on, registered under an email that does not depend on
+# this domain. Recreate these records at any DNS host in minutes.
+#
+# PREREQUISITE: the domain's DNS must be hosted on Cloudflare (free
+# plan) to attach a custom domain to the Worker. Point the registrar's
+# nameservers at the pair Cloudflare assigns.
+
+# --- Primary: Cloudflare Worker (shanesparks-com) ----------------------
+# Added via dashboard or:  npx wrangler deploy (then Workers > Settings >
+# Domains & Routes > add custom domain). Cloudflare manages the apex
+# record itself once the custom domain is attached.
+shanesparks.com          -> Worker custom domain (managed by Cloudflare)
+
+# --- www redirect -------------------------------------------------------
+# CNAME www -> shanesparks.com (proxied), plus a Cloudflare "Redirect
+# Rule": www.shanesparks.com/* -> https://shanesparks.com/$1 (301).
+www                      CNAME  shanesparks.com
+
+# --- GitHub Pages mirror (hot standby) ----------------------------------
+# Requires the CNAME line in scripts/deploy.ps1 to be uncommented, and
+# the custom domain set in the GitHub repo's Pages settings (this also
+# provisions HTTPS). If Cloudflare ever drops us: repoint the apex here.
+mirror                   CNAME  <username>.github.io
+
+# --- CAA: only these CAs may issue certificates for the domain ----------
+shanesparks.com          CAA    0 issue "letsencrypt.org"
+shanesparks.com          CAA    0 issue "pki.goog"
+shanesparks.com          CAA    0 issue "ssl.com"
+# (Cloudflare provisions its edge certs via these CAs; GitHub Pages uses
+# Let's Encrypt. Adjust if either host's documentation changes.)

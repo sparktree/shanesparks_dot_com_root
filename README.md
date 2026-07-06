@@ -25,13 +25,24 @@ powershell -ExecutionPolicy Bypass -File scripts\vendor.ps1
 The deployed artifact is the `_site/` folder — plain HTML/CSS/JS that works on any
 web server, e.g. `python -m http.server -d _site`.
 
+## Deploy
+
+Both hosts receive the same locally-built artifact:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\deploy.ps1
+```
+
+One-time setup: `npx wrangler login` (Cloudflare), create the GitHub repo
+(name it `<username>.github.io` so Pages serves at the root) and
+`git remote add origin <url>`, then enable Pages from the `gh-pages` branch.
+
 ## Resurrection path (from a bare clone on a fresh machine)
 
 1. Install Node (version in `.nvmrc`) and run the build commands above.
-2. Deploy `_site/` — see PLAN.md Phase 5 (`scripts/deploy.sh` once it exists:
-   Cloudflare Workers Static Assets via `wrangler deploy`, GitHub Pages via
-   `gh-pages` branch push).
-3. Recreate DNS from `dns/zone.txt` (once it exists).
+2. Run `scripts\deploy.ps1` (after `npx wrangler login` and adding the
+   `origin` remote).
+3. Recreate DNS from `dns/zone.txt`.
 
 ## Layout
 
