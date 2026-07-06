@@ -1,10 +1,10 @@
-# deploy.ps1 — build locally, deploy the identical artifact to both hosts.
+﻿# deploy.ps1 - build locally, deploy the identical artifact to both hosts.
 # The build happens on our hardware; hosts only ever receive inert files.
 #
 # One-time setup:
 #   Cloudflare:  npx wrangler login
 #   GitHub:      create the repo (recommended name: <username>.github.io so
-#                Pages serves at the root — absolute paths like /css/ depend
+#                Pages serves at the root - absolute paths like /css/ depend
 #                on it), then: git remote add origin <url>
 #                In the repo settings, set Pages to deploy from gh-pages.
 #
@@ -28,7 +28,7 @@ if ($LASTEXITCODE -ne 0) { throw "wrangler deploy failed (run 'npx wrangler logi
 # artifact, no history bloat, force-pushed each deploy.
 $origin = git remote get-url origin 2>$null
 if (-not $origin) {
-	Write-Warning "No 'origin' remote — skipping GitHub Pages mirror."
+	Write-Warning "No 'origin' remote - skipping GitHub Pages mirror."
 	exit 0
 }
 Write-Host "`nDeploying mirror to GitHub Pages..."

@@ -1,7 +1,7 @@
-# vendor.ps1 — reproducible re-vendoring of runtime assets.
+﻿# vendor.ps1 - reproducible re-vendoring of runtime assets.
 # Everything the demos load at runtime comes from our own origin; this
 # script is the only place third-party servers are ever contacted, and
-# only at vendoring time. Versions are pinned below — bump deliberately.
+# only at vendoring time. Versions are pinned below - bump deliberately.
 #
 # Usage:  powershell -ExecutionPolicy Bypass -File scripts\vendor.ps1
 
@@ -39,7 +39,7 @@ $tfDest = Join-Path $root "vendor\transformers"
 New-Item -ItemType Directory -Force (Join-Path $tfDest "onnx") | Out-Null
 Copy-Item (Join-Path $root "node_modules\@huggingface\transformers\dist\transformers.min.js") (Join-Path $tfDest "transformers.min.js") -Force
 # All four runtime variants: the browser-dependent resolution logic may
-# pick any of plain / jsep / asyncify / jspi — vendor them all so no
+# pick any of plain / jsep / asyncify / jspi - vendor them all so no
 # path ever leaves our origin.
 foreach ($f in "ort-wasm-simd-threaded.mjs","ort-wasm-simd-threaded.wasm","ort-wasm-simd-threaded.jsep.mjs","ort-wasm-simd-threaded.jsep.wasm","ort-wasm-simd-threaded.asyncify.mjs","ort-wasm-simd-threaded.asyncify.wasm","ort-wasm-simd-threaded.jspi.mjs","ort-wasm-simd-threaded.jspi.wasm") {
 	Copy-Item (Join-Path $root "node_modules\onnxruntime-web\dist\$f") (Join-Path $tfDest "onnx\$f") -Force
@@ -58,6 +58,6 @@ Invoke-WebRequest "$base/onnx/model_quantized.onnx" -OutFile (Join-Path $mDest "
 # --- Cloudflare per-file cap check ------------------------------------
 $cap = 25MB
 Get-ChildItem (Join-Path $root "vendor"), (Join-Path $root "models") -Recurse -File | ForEach-Object {
-	if ($_.Length -gt $cap) { Write-Warning "$($_.FullName) is $([math]::Round($_.Length/1MB,1)) MB — exceeds the 25 MiB Cloudflare cap" }
+	if ($_.Length -gt $cap) { Write-Warning "$($_.FullName) is $([math]::Round($_.Length/1MB,1)) MB - exceeds the 25 MiB Cloudflare cap" }
 }
 Write-Host "Done."
