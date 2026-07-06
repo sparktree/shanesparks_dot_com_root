@@ -17,7 +17,8 @@ the way music does. **Use this to resolve any design ambiguity.**
    arcadey. Implemented: **Departure Mono** (display/labels/code) + **Space Grotesk**
    (body prose). Alternatives on file in `/styleguide/`; swapping is one woff2 + one token.
 2. **Colors** — seeds `#005A78` (deep cyan), `#75D1D9` (bright cyan), `#AB7100`
-   (deep amber), `#FFF8E7` (cosmic latte, light bg) and `#16161D` (eigengrau, dark bg).
+   (deep amber), `#E69800` (bright amber, promoted to sixth seed 2026-07-06),
+   `#FFF8E7` (cosmic latte, light bg) and `#16161D` (eigengrau, dark bg).
    Rules (clarified 2026-07-06): non-link text is always eigengrau on cosmic latte or
    the inverse; links are deep cyan on cosmic latte and bright cyan on eigengrau; the
    cyans and amber are **highlights** — text never sits on them; amber may be text on
@@ -51,6 +52,15 @@ the way music does. **Use this to resolve any design ambiguity.**
    bright cyan belongs exclusively to the fractal (rare gold blocks within it).
    Base seed probability eased to 0.68; base alpha floor raised 0.45 → 0.65 so no
    region reads dull.
+   *Two territories per Shane (2026-07-06):* the map splits down the middle along a
+   wavering, per-pixel dithered boundary so palettes bleed across a gradient.
+   Projects (left): deep-cyan body, rule 90 cascade in bright cyan, amber glints.
+   Writings (right): body graded deep purple → vermillion, rule 150 lace flowing
+   horizontally (its time axis runs like lines of text) graded lavender → sandstone.
+   Each future section gets its own fractal rule, palette, and energy.
+   *Open decision:* Writings hexes are PROVISIONAL placeholders —
+   body `#53337F→#B5431C`, fractal `#B49CE0→#DFAE7E`, glint `#DFAE7E` — awaiting
+   Shane's chosen values.
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."

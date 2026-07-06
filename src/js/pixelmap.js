@@ -1,12 +1,17 @@
-/* pixelmap.js — the homepage map, v0.
-   A pixel field grown from a seeded cellular automaton, rendered at grid
+/* pixelmap.js — the homepage map, v1: two territories.
+   A dense pixel field grown from cellular automata, rendered at grid
    resolution and upscaled so the pixels stay visible (truth to medium:
-   the structure is genuinely computed, not painted). One region for now
-   (Projects); REGION GEOMETRY below is the extension point when the map
-   gains subsections.
-   Per Shane: a dense horizontal oval — cyans primary, amber/gold
-   secondary — identical in both schemes, with a genuine fractal
-   (rule 90 Sierpinski cascade) woven bright through a deep-cyan body. */
+   the structure is genuinely computed, not painted).
+
+   Two territories split down the middle by a wavering, per-pixel
+   dithered boundary, so their palettes bleed into each other:
+     - Projects (left): deep-cyan body, rule 90 Sierpinski cascade
+       falling vertically in bright cyan, amber glints.
+     - Writings (right): body graded deep purple -> vermillion, rule 150
+       lace flowing horizontally (time runs like lines of text) graded
+       lavender -> sandstone. Palette PROVISIONAL pending Shane's hexes.
+   Each new section added to the map gets its own fractal rule, palette,
+   and energy. TERRITORY GEOMETRY below is the extension point. */
 (() => {
 	"use strict";
 
@@ -22,14 +27,19 @@
 	canvas.height = H;
 	host.classList.add("is-grown"); // drops the no-JS fallback pattern
 
+	/* Projects palette (site seeds) */
 	const CYAN_DEEP = "#005a78";
 	const CYAN_BRIGHT = "#75d1d9";
-	/* Map-local amber: the seed #AB7100 reads brown at pixel scale here,
-	   so glints use it brightened ~1.35x (Shane, 2026-07-06). */
-	const AMBER_GLINT = "#e69800";
+	const AMBER_BRIGHT = "#e69800"; // sixth seed
 
-	/* Deterministic PRNG (mulberry32) — the field is designed, not random:
-	   the same structure grows on every visit. */
+	/* Writings palette — quantized 4-step gradients, PROVISIONAL:
+	   body: deep purple -> vermillion; fractal: lavender -> sandstone. */
+	const W_BODY = ["#53337f", "#74385e", "#943e3d", "#b5431c"];
+	const W_FRACTAL = ["#b49ce0", "#c2a2bf", "#d1a89f", "#dfae7e"];
+	const W_GLINT = "#dfae7e";
+
+	/* Deterministic PRNGs (mulberry32) — the field is designed, not
+	   random: the same structure grows on every visit. */
 	function mulberry32(a) {
 		return function () {
 			a |= 0;
@@ -41,11 +51,7 @@
 	}
 	const rand = mulberry32(0x5eed);
 
-	/* --- REGION GEOMETRY (extension point) ------------------------------
-	   Seed probability field: a dense horizontal ellipse with a soft
-	   organic boundary; angular lobes and a spiral ripple leave faint
-	   pores and texture in an otherwise filled body. Future subsections
-	   get their own sectors / fields and colors here. */
+	/* --- Base body: dense horizontal ellipse ----------------------------- */
 	let grid = new Uint8Array(W * H);
 	const cx = W / 2;
 	const cy = H / 2;
@@ -81,34 +87,53 @@
 		grid = next;
 	}
 
-	/* --- Fractal layer ---------------------------------------------------
-	   Rule 90 — the canonical fractal cellular automaton: each cell is
-	   the XOR of its two diagonal ancestors, so a sparse initial line
-	   cascades down the field as nested Sierpinski triangles. Grown at
-	   half resolution (one fractal cell = a 2x2 pixel block) so the
-	   triangles read large and unmistakable. Its own PRNG keeps the
-	   fractal independent of base-field tuning. */
+	/* --- Fractal layers, half resolution (one cell = 2x2 pixel block) ---- */
 	const FW = W / 2;
 	const FH = H / 2;
-	const frand = mulberry32(0xf7ac7a1);
-	const fractal = new Uint8Array(FW * FH);
-	for (let x = 0; x < FW; x++) if (frand() < 0.05) fractal[x] = 1;
+
+	/* Projects: rule 90 — each cell is the XOR of its two diagonal
+	   ancestors; a sparse initial line cascades down the field as
+	   nested Sierpinski triangles. */
+	const frandP = mulberry32(0xf7ac7a1);
+	const fracP = new Uint8Array(FW * FH);
+	for (let x = 0; x < FW; x++) if (frandP() < 0.05) fracP[x] = 1;
 	for (let y = 1; y < FH; y++)
 		for (let x = 0; x < FW; x++)
-			fractal[y * FW + x] =
-				fractal[(y - 1) * FW + ((x + FW - 1) % FW)] ^
-				fractal[(y - 1) * FW + ((x + 1) % FW)];
-
-	/* Per-fractal-cell color so each 2x2 block is uniform and crisp:
-	   bright cyan with rare gold. */
-	const fcolor = new Array(FW * FH);
+			fracP[y * FW + x] =
+				fracP[(y - 1) * FW + ((x + FW - 1) % FW)] ^
+				fracP[(y - 1) * FW + ((x + 1) % FW)];
+	const fcolorP = new Array(FW * FH);
 	for (let i = 0; i < FW * FH; i++)
-		if (fractal[i]) fcolor[i] = frand() < 0.08 ? AMBER_GLINT : CYAN_BRIGHT;
+		if (fracP[i]) fcolorP[i] = frandP() < 0.08 ? AMBER_BRIGHT : CYAN_BRIGHT;
 
-	/* Cells: the base body is deep cyan alone — bright cyan belongs to
-	   the fractal layer, so the lattice actually reads against the
-	   field (mixing bright into the base camouflaged it). Alpha is
-	   quantized and floors high so no region reads dull. */
+	/* Writings: rule 150 — XOR of up-left, left, and down-left ancestors,
+	   cascading left-to-right (bounded, denser seeds: a woven lace with
+	   a different energy than rule 90's clean triangles). */
+	const frandW = mulberry32(0x9a9e5);
+	const fracW = new Uint8Array(FW * FH);
+	for (let y = 0; y < FH; y++) if (frandW() < 0.14) fracW[y * FW] = 1;
+	for (let x = 1; x < FW; x++)
+		for (let y = 0; y < FH; y++) {
+			const a = y > 0 ? fracW[(y - 1) * FW + x - 1] : 0;
+			const b = fracW[y * FW + x - 1];
+			const c = y < FH - 1 ? fracW[(y + 1) * FW + x - 1] : 0;
+			fracW[y * FW + x] = a ^ b ^ c;
+		}
+
+	/* --- TERRITORY GEOMETRY (extension point) ----------------------------
+	   A wavering vertical boundary near the middle; each pixel joins a
+	   territory stochastically by its distance from the line, so the two
+	   palettes bleed into each other across a dithered gradient. New
+	   sections get new boundary curves, rules, and palettes here. */
+	function boundaryX(y) {
+		return W * 0.52 + 9 * Math.sin(y * 0.16 + 1.3) + 5 * Math.sin(y * 0.06 - 0.5);
+	}
+
+	/* --- Compose cells ---------------------------------------------------
+	   Within each territory: body deep, fractal bright (the layers stay
+	   color-separated so the lattice reads). Writings colors are graded
+	   by distance from the boundary, quantized to 4 steps. Alpha floors
+	   high so no region reads dull. */
 	const BASE_ALPHAS = [0.65, 0.85, 1];
 	const cells = [];
 	for (let y = 0; y < H; y++)
@@ -116,15 +141,32 @@
 			const nx = (x - cx) / (W / 2);
 			const ny = (y - cy) / (H / 2);
 			const inField = Math.hypot(nx, ny) < 0.95;
+			const bx = boundaryX(y);
+			const isWritings = rand() < 1 / (1 + Math.exp(-(x - bx) / 5));
 			const fi = (y >> 1) * FW + (x >> 1);
-			if (fractal[fi] && inField) {
-				cells.push({ x, y, color: fcolor[fi], a: 1 });
-			} else if (grid[y * W + x]) {
-				const n = neighbors(grid, x, y);
-				if (n >= 6 && rand() < 0.13) {
-					cells.push({ x, y, color: AMBER_GLINT, a: rand() < 0.5 ? 0.85 : 1 });
-				} else {
-					cells.push({ x, y, color: CYAN_DEEP, a: BASE_ALPHAS[Math.floor(rand() * 3)] });
+			if (isWritings) {
+				const g = Math.max(0, Math.min(1, (x - bx) / (W - bx - 6)));
+				const q = Math.min(3, Math.floor(g * 4));
+				if (fracW[fi] && inField) {
+					cells.push({ x, y, color: W_FRACTAL[q], a: 1 });
+				} else if (grid[y * W + x]) {
+					const n = neighbors(grid, x, y);
+					if (n >= 6 && rand() < 0.13) {
+						cells.push({ x, y, color: W_GLINT, a: rand() < 0.5 ? 0.85 : 1 });
+					} else {
+						cells.push({ x, y, color: W_BODY[q], a: BASE_ALPHAS[Math.floor(rand() * 3)] });
+					}
+				}
+			} else {
+				if (fracP[fi] && inField) {
+					cells.push({ x, y, color: fcolorP[fi], a: 1 });
+				} else if (grid[y * W + x]) {
+					const n = neighbors(grid, x, y);
+					if (n >= 6 && rand() < 0.13) {
+						cells.push({ x, y, color: AMBER_BRIGHT, a: rand() < 0.5 ? 0.85 : 1 });
+					} else {
+						cells.push({ x, y, color: CYAN_DEEP, a: BASE_ALPHAS[Math.floor(rand() * 3)] });
+					}
 				}
 			}
 		}

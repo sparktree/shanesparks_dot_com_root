@@ -82,11 +82,26 @@
 	image-rendering: pixelated;
 }
 
-.pixel-map-label {
+/* Each territory is its own link covering half the map. */
+.pixel-map-territory {
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	top: 0;
+	bottom: 0;
+	width: 50%;
+	display: grid;
+	place-items: center;
+	text-decoration: none;
+}
+
+.pixel-map-territory[data-side="left"] {
+	left: 0;
+}
+
+.pixel-map-territory[data-side="right"] {
+	right: 0;
+}
+
+.pixel-map-label {
 	padding: var(--space-1) var(--space-2);
 	background: var(--color-bg);
 	border: 1px solid var(--color-rule);
@@ -98,13 +113,13 @@
 	text-underline-offset: 0.1875em;
 }
 
-.pixel-map:hover .pixel-map-label {
+.pixel-map-territory:hover .pixel-map-label {
 	text-decoration-color: var(--color-highlight);
 }
 
-.pixel-map:focus-visible {
+.pixel-map-territory:focus-visible {
 	outline: 2px solid var(--color-link);
-	outline-offset: 4px;
+	outline-offset: -2px;
 }
 
 .map-tagline {
