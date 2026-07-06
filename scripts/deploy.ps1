@@ -39,8 +39,8 @@ New-Item -ItemType Directory $tmp | Out-Null
 Copy-Item "$root\_site\*" $tmp -Recurse
 # GitHub Pages runs Jekyll unless told not to; we ship plain files.
 New-Item -ItemType File (Join-Path $tmp ".nojekyll") | Out-Null
-# When mirror.shanesparks.com exists, uncomment to pin the custom domain:
-# Set-Content (Join-Path $tmp "CNAME") "mirror.shanesparks.com"
+# Pin the Pages custom domain (GitHub reads this file from the branch).
+Set-Content (Join-Path $tmp "CNAME") "mirror.shanesparks.com"
 git -C $tmp init -b gh-pages -q
 git -C $tmp add -A
 git -C $tmp -c user.name="Shane Sparks" -c user.email="sparktree@users.noreply.github.com" commit -q -m "Deploy $sha"
