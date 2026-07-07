@@ -61,11 +61,18 @@ description: Words become quantum states in your browser — amplitude encoding 
 	#q-shotmap {
 		min-height: 14px;
 	}
-	#q-conv,
+	/* Convergence and scatter render at device resolution — crisp text;
+	   only the strips and shot bitmap stay pixelated (pixels ARE the data). */
+	#q-conv {
+		display: block;
+		width: 100%;
+		height: 6.5rem;
+		border: 1px solid var(--color-rule);
+	}
 	#r-scatter {
 		display: block;
 		width: 100%;
-		image-rendering: pixelated;
+		aspect-ratio: 1;
 	}
 	.q-readouts {
 		display: grid;
@@ -163,11 +170,21 @@ description: Words become quantum states in your browser — amplitude encoding 
 		<canvas id="q-conv"></canvas>
 
 		<div class="q-readouts">
+			<div>amplitudes <strong id="q-amps">—</strong></div>
+			<div>qubits (per reg / total) <strong id="q-qubits">—</strong></div>
 			<div>classical cosine <strong id="q-cos">—</strong></div>
 			<div>cosine² <strong id="q-cos2">—</strong></div>
 			<div>exact |⟨a|b⟩|² <strong id="q-fid">—</strong></div>
+			<div>Δ from cosine² <strong id="q-dfid">—</strong></div>
 			<div>SWAP estimate <strong id="q-est">—</strong></div>
 		</div>
+
+		<p class="post-meta">
+			Toggling to a complex encoding halves the amplitudes and drops a
+			qubit — while Δ, the fidelity's departure from cosine², stays in
+			the third or fourth decimal. That near-agreement <em>is</em> the
+			paper's finding: the information survives the compression.
+		</p>
 	</div>
 </div>
 

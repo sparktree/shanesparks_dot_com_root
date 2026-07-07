@@ -54,6 +54,7 @@ $("q-load").addEventListener("click", () => {
 $("q-model").addEventListener("change", () => {
 	ready = false;
 	$("q-run").disabled = true;
+	$("q-load").hidden = false;
 	$("q-load").disabled = false;
 	setStatus("model changed - load it");
 });
@@ -80,6 +81,7 @@ function onWorkerMessage(e) {
 	else if (m.type === "ready") {
 		ready = true;
 		setStatus(`ready (${m.device})`);
+		$("q-load").hidden = true;
 		$("q-run").disabled = false;
 		$("q-io").hidden = false;
 	} else if (m.type === "encoded") {
@@ -87,12 +89,15 @@ function onWorkerMessage(e) {
 		drawStrip($("q-strip-a"), m.stripA);
 		drawStrip($("q-strip-b"), m.stripB);
 		$("q-stats").innerHTML =
-			`${m.dims} dims &rarr; ${m.amps} amplitudes (padded to ${m.dim}) &rarr; ` +
-			`<strong>${m.qubits} qubits</strong> per register, ${m.totalQubits} total with ancilla; ` +
+			`${m.dims} dims &rarr; ${m.amps} amplitudes (padded to ${m.dim}); ` +
 			`state preparation ~O(${m.amps}) gates; running on ${m.device}`;
-		$("q-cos").textContent = m.cos.toFixed(4);
-		$("q-cos2").textContent = (m.cos * m.cos).toFixed(4);
-		$("q-fid").textContent = m.fid.toFixed(4);
+		$("q-amps").textContent = m.amps;
+		$("q-qubits").textContent = `${m.qubits} / ${m.totalQubits}`;
+		$("q-cos").textContent = m.cos.toFixed(6);
+		$("q-cos2").textContent = (m.cos * m.cos).toFixed(6);
+		$("q-fid").textContent = m.fid.toFixed(6);
+		const d = m.fid - m.cos * m.cos;
+		$("q-dfid").textContent = (d >= 0 ? "+" : "") + d.toFixed(6);
 		setStatus("measuring...");
 	} else if (m.type === "shots") {
 		paintShots(m);
@@ -181,10 +186,12 @@ let convPoints = [];
 function drawConvergence(n, est, ci) {
 	convPoints.push({ n, est, ci });
 	const cv = $("q-conv");
-	const W = (cv.width = 300);
-	const H = (cv.height = 90);
+	const dpr = devicePixelRatio || 1;
+	const W = (cv.width = Math.max(1, Math.round(cv.clientWidth * dpr)));
+	const H = (cv.height = Math.max(1, Math.round(cv.clientHeight * dpr)));
 	const ctx = cv.getContext("2d");
 	ctx.clearRect(0, 0, W, H);
+	ctx.lineWidth = dpr;
 	const shots = parseInt($("q-shots").value, 10);
 	const x = (nn) => 2 + (W - 4) * (nn / shots);
 	const y = (v) => H - 2 - (H - 4) * Math.max(0, Math.min(1, v));
@@ -281,6 +288,11 @@ $("r-comp").addEventListener("change", () => {
 	drawScatter();
 });
 $("r-model").addEventListener("change", drawScatter);
+let resizeTimer = 0;
+addEventListener("resize", () => {
+	clearTimeout(resizeTimer);
+	resizeTimer = setTimeout(drawScatter, 150);
+});
 
 function spearman(xs, ys) {
 	const rank = (v) => {
@@ -326,27 +338,36 @@ function drawScatter() {
 	$("r-rho").textContent = `Spearman ρ = ${rho.toFixed(4)} (n = ${points.length})`;
 
 	const cv = $("r-scatter");
-	const W = (cv.width = 400);
-	const H = (cv.height = 400);
+	const dpr = devicePixelRatio || 1;
+	const W = (cv.width = Math.max(1, Math.round(cv.clientWidth * dpr)));
+	const H = (cv.height = W);
 	const ctx = cv.getContext("2d");
 	ctx.clearRect(0, 0, W, H);
+	const u = dpr; // device-pixel unit
+	const padL = 18 * u;
+	const padR = 8 * u;
+	const padT = 8 * u;
+	const padB = 18 * u;
 	const xs = points.map((p) => p.x);
 	const ys = points.map((p) => p.y);
 	const x0 = Math.min(...xs);
 	const x1 = Math.max(...xs);
 	const y0 = Math.min(...ys);
 	const y1 = Math.max(...ys);
-	const X = (v) => 14 + ((W - 22) * (v - x0)) / (x1 - x0 || 1);
-	const Y = (v) => H - 14 - ((H - 22) * (v - y0)) / (y1 - y0 || 1);
+	const X = (v) => padL + ((W - padL - padR) * (v - x0)) / (x1 - x0 || 1);
+	const Y = (v) => H - padB - ((H - padT - padB) * (v - y0)) / (y1 - y0 || 1);
+	ctx.lineWidth = u;
 	ctx.strokeStyle = C.rule;
-	ctx.strokeRect(12, 6, W - 18, H - 20);
+	ctx.strokeRect(padL - 2 * u, padT - 2 * u, W - padL - padR + 4 * u, H - padT - padB + 4 * u);
 	ctx.fillStyle = C.link;
-	for (const p of points) ctx.fillRect(Math.round(X(p.x)) - 1, Math.round(Y(p.y)) - 1, 2, 2);
+	const s = Math.max(2, Math.round(1.6 * u));
+	for (const p of points)
+		ctx.fillRect(Math.round(X(p.x)) - s / 2, Math.round(Y(p.y)) - s / 2, s, s);
 	ctx.fillStyle = C.fg;
-	ctx.font = "10px 'Departure Mono', monospace";
-	ctx.fillText(comp.xl, 16, H - 2);
+	ctx.font = `${Math.round(11 * u)}px 'Departure Mono', monospace`;
+	ctx.fillText(comp.xl, padL, H - 4 * u);
 	ctx.save();
-	ctx.translate(8, H - 18);
+	ctx.translate(12 * u, H - padB);
 	ctx.rotate(-Math.PI / 2);
 	ctx.fillText(comp.yl, 0, 0);
 	ctx.restore();
