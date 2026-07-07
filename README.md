@@ -55,16 +55,11 @@ fixed a nondeterministic sitemap ordering and stale files lingering in
 
 - **The repo is the site; local is canonical.** Keep the working copy in
   your normal backup rotation.
-- **Second remote (do this once):** create an empty repo on a host with
-  different failure modes than GitHub (Codeberg or GitLab), then:
-
-  ```sh
-  git remote add mirror <url>
-  git remote set-url --add --push origin <github-url>
-  git remote set-url --add --push origin <mirror-url>
-  ```
-
-  After that, every `git push origin main` lands on both hosts.
+- **Second remote (done 2026-07-06):** the source is mirrored at
+  https://codeberg.org/shanesparks/shanesparksdotcom — `origin` is
+  configured to push to both hosts, so every `git push origin main`
+  lands on GitHub and Codeberg together. (To recreate on a fresh clone:
+  `git remote set-url --add --push origin <each-url>`.)
 - **Hosting mirrors:** the deployed artifact already lives on Cloudflare
   (primary) and GitHub Pages (`mirror.shanesparks.com`); flight plan in
   `dns/zone.txt`.
