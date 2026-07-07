@@ -21,7 +21,7 @@
 	if (!canvas) return;
 	const ctx = canvas.getContext("2d");
 
-	const W = 192; // CA grid; one cell = one rendered pixel
+	const W = 256; // CA grid; one cell = one rendered pixel (8:3 oval)
 	const H = 96;
 	canvas.width = W;
 	canvas.height = H;
@@ -61,7 +61,7 @@
 			const ny = (y - cy) / (H / 2);
 			const r = Math.hypot(nx, ny);
 			const a = Math.atan2(ny, nx);
-			const edge = 1 / (1 + Math.exp((r - 0.9) / 0.035));
+			const edge = 1 / (1 + Math.exp((r - 0.92) / 0.015));
 			const lobes = 0.14 * Math.sin(a * 3 + 1.7) * Math.sin(a * 5 - 0.4);
 			const ripple = 0.12 * Math.cos(r * 14 - a * 2);
 			if (rand() < edge * (0.68 + lobes + ripple)) grid[y * W + x] = 1;
@@ -135,19 +135,30 @@
 	   by distance from the boundary, quantized to 4 steps. Alpha floors
 	   high so no region reads dull. */
 	const BASE_ALPHAS = [0.65, 0.85, 1];
+	const RIM_PX = 4; // solid boundary ring thickness, in pixels
+	const FRACTAL_INSET_PX = 8; // fractals stop short of the rim (no jagged edge)
 	const cells = [];
 	for (let y = 0; y < H; y++)
 		for (let x = 0; x < W; x++) {
 			const nx = (x - cx) / (W / 2);
 			const ny = (y - cy) / (H / 2);
-			const inField = Math.hypot(nx, ny) < 0.95;
+			const r = Math.hypot(nx, ny);
+			if (r >= 0.95) continue;
+			/* Pixel distance to the boundary along this ray — uniform rim
+			   thickness despite the elliptical normalization. */
+			const P = Math.hypot(x - cx, y - cy);
+			const rimDist = r > 0.001 ? P * (0.95 / r - 1) : 1e9;
+			const isRim = rimDist <= RIM_PX;
+			const fractalOK = rimDist > FRACTAL_INSET_PX;
 			const bx = boundaryX(y);
-			const isWritings = rand() < 1 / (1 + Math.exp(-(x - bx) / 5));
+			const isWritings = rand() < 1 / (1 + Math.exp(-(x - bx) / 2));
 			const fi = (y >> 1) * FW + (x >> 1);
 			if (isWritings) {
 				const g = Math.max(0, Math.min(1, (x - bx) / (W - bx - 6)));
 				const q = Math.min(3, Math.floor(g * 4));
-				if (fracW[fi] && inField) {
+				if (isRim) {
+					cells.push({ x, y, color: W_BODY[q], a: rand() < 0.5 ? 0.85 : 1 });
+				} else if (fracW[fi] && fractalOK) {
 					cells.push({ x, y, color: W_FRACTAL[q], a: 1 });
 				} else if (grid[y * W + x]) {
 					const n = neighbors(grid, x, y);
@@ -158,7 +169,9 @@
 					}
 				}
 			} else {
-				if (fracP[fi] && inField) {
+				if (isRim) {
+					cells.push({ x, y, color: CYAN_DEEP, a: rand() < 0.5 ? 0.85 : 1 });
+				} else if (fracP[fi] && fractalOK) {
 					cells.push({ x, y, color: fcolorP[fi], a: 1 });
 				} else if (grid[y * W + x]) {
 					const n = neighbors(grid, x, y);
@@ -171,8 +184,16 @@
 			}
 		}
 
-	/* Pointer reaction: cells near the cursor are pushed outward and
-	   spring back — the field shifts around the visitor's presence. */
+	/* Pointer reaction: cells near the cursor flow along the streamlines
+	   of a golden (Fibonacci) spiral centered on it, and spring back.
+	   A log spiral with growth φ per quarter turn has pitch
+	   b = ln(φ)/(π/2); its tangent sits atan(b) from the tangential
+	   direction, so displacement = the outward radial rotated by
+	   (90° − atan(b)) ≈ 73° — mostly swirl, slightly outward. */
+	const PHI = (1 + Math.sqrt(5)) / 2;
+	const SPIRAL_ROT = Math.PI / 2 - Math.atan(Math.log(PHI) / (Math.PI / 2));
+	const COS_S = Math.cos(SPIRAL_ROT);
+	const SIN_S = Math.sin(SPIRAL_ROT);
 	const ox = new Float32Array(cells.length);
 	const oy = new Float32Array(cells.length);
 	let pointer = null;
@@ -201,8 +222,10 @@
 				const d = Math.hypot(dx, dy);
 				if (d < R && d > 0.001) {
 					const f = (1 - d / R) * 4;
-					tx = (dx / d) * f;
-					ty = (dy / d) * f;
+					const ux = dx / d;
+					const uy = dy / d;
+					tx = (ux * COS_S - uy * SIN_S) * f;
+					ty = (ux * SIN_S + uy * COS_S) * f;
 				}
 			}
 			ox[i] += (tx - ox[i]) * 0.18;

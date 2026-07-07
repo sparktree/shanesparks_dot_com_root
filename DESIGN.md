@@ -61,6 +61,14 @@ the way music does. **Use this to resolve any design ambiguity.**
    Writings hexes confirmed by Shane (2026-07-06): body `#53337F→#B5431C`,
    fractal `#B49CE0→#DFAE7E`, glint `#DFAE7E`. Territory labels speak their
    section's color (deep variant on light, bright on dark).
+   *Refinements per Shane (2026-07-06):* pointer interaction flows along
+   golden-spiral streamlines (displacement = radial rotated by
+   90° − atan(ln φ / (π/2)) ≈ 73°); oval widened to 8:3 (256×96 grid, up to
+   64rem); a solid 4px rim ring (uniform in pixel distance) replaces the
+   piecemeal edge, with fractals inset 8px from the boundary; territory
+   dithering tightened (sigmoid width 5 → 2) so the palettes bleed less.
+   Runtime hello-world demos removed (superseded by the quantum demo);
+   Pyodide stays vendored for future Phase 4 work.
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."
