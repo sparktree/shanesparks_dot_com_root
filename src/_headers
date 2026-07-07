@@ -16,6 +16,14 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
+# Authored code iterates often; keep the edge cache short so deploys
+# propagate within minutes instead of needing manual purges.
+/js/*
+  Cache-Control: public, max-age=300
+
+/css/*
+  Cache-Control: public, max-age=300
+
 # Heavy pinned assets: cache for 30 days (paths are stable across
 # re-vendoring, so no immutable/year-long poisoning risk).
 /vendor/*

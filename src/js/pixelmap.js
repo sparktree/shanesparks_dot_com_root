@@ -184,16 +184,18 @@
 			}
 		}
 
-	/* Pointer reaction: cells near the cursor flow along the streamlines
-	   of a golden (Fibonacci) spiral centered on it, and spring back.
-	   A log spiral with growth φ per quarter turn has pitch
-	   b = ln(φ)/(π/2); its tangent sits atan(b) from the tangential
-	   direction, so displacement = the outward radial rotated by
-	   (90° − atan(b)) ≈ 73° — mostly swirl, slightly outward. */
+	/* Pointer reaction: a living golden vortex. Each cell near the cursor
+	   is displaced along a phase field whose angle carries the true
+	   log-spiral term φ − ln(d)/(b·spread) — b = ln(φ)/(π/2) is the
+	   golden pitch, and spread > 1 unwinds the arms so they read broad
+	   rather than spidery — plus a slow clock, so the arms rotate
+	   continuously for as long as the pointer rests on the map.
+	   (Disabled entirely under prefers-reduced-motion, as before.) */
 	const PHI = (1 + Math.sqrt(5)) / 2;
-	const SPIRAL_ROT = Math.PI / 2 - Math.atan(Math.log(PHI) / (Math.PI / 2));
-	const COS_S = Math.cos(SPIRAL_ROT);
-	const SIN_S = Math.sin(SPIRAL_ROT);
+	const SPIRAL_PITCH = Math.log(PHI) / (Math.PI / 2);
+	const SPIRAL_ROT = Math.PI / 2 - Math.atan(SPIRAL_PITCH);
+	const ARM_SPREAD = 2; // >1 = thicker, calmer arms
+	const SWIRL_RATE = 0.8; // radians per second of arm rotation
 	const ox = new Float32Array(cells.length);
 	const oy = new Float32Array(cells.length);
 	let pointer = null;
@@ -211,7 +213,8 @@
 	}
 
 	function tick() {
-		const R = 18; // influence radius, in grid cells
+		const R = 24; // influence radius, in grid cells
+		const t = performance.now() / 1000;
 		let settled = true;
 		for (let i = 0; i < cells.length; i++) {
 			let tx = 0;
@@ -221,11 +224,14 @@
 				const dy = cells[i].y - pointer.y;
 				const d = Math.hypot(dx, dy);
 				if (d < R && d > 0.001) {
-					const f = (1 - d / R) * 4;
-					const ux = dx / d;
-					const uy = dy / d;
-					tx = (ux * COS_S - uy * SIN_S) * f;
-					ty = (ux * SIN_S + uy * COS_S) * f;
+					const f = (1 - d / R) * 5;
+					const theta =
+						Math.atan2(dy, dx) +
+						SPIRAL_ROT +
+						t * SWIRL_RATE -
+						Math.log(Math.max(d, 1)) / (SPIRAL_PITCH * ARM_SPREAD);
+					tx = Math.cos(theta) * f;
+					ty = Math.sin(theta) * f;
 				}
 			}
 			ox[i] += (tx - ox[i]) * 0.18;
