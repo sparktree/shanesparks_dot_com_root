@@ -15,6 +15,9 @@ $root = Split-Path $PSScriptRoot -Parent
 Set-Location $root
 
 # --- Build -------------------------------------------------------------
+# Clean first: Eleventy never removes stale output, and stale files would
+# ship to production (found by the Phase 6 resurrection test).
+if (Test-Path "$root\_site") { Remove-Item "$root\_site" -Recurse -Force }
 npm run build
 if ($LASTEXITCODE -ne 0) { throw "build failed" }
 

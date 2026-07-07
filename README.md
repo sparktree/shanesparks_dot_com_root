@@ -46,6 +46,31 @@ One-time setup: `npx wrangler login` (Cloudflare), create the GitHub repo
    `origin` remote).
 3. Recreate DNS from `dns/zone.txt`.
 
+**Tested 2026-07-06:** a fresh clone from GitHub built the complete site;
+output verified against the canonical build by SHA-256. (The test caught and
+fixed a nondeterministic sitemap ordering and stale files lingering in
+`_site/` — the deploy script now cleans before building.)
+
+## Resilience
+
+- **The repo is the site; local is canonical.** Keep the working copy in
+  your normal backup rotation.
+- **Second remote (do this once):** create an empty repo on a host with
+  different failure modes than GitHub (Codeberg or GitLab), then:
+
+  ```sh
+  git remote add mirror <url>
+  git remote set-url --add --push origin <github-url>
+  git remote set-url --add --push origin <mirror-url>
+  ```
+
+  After that, every `git push origin main` lands on both hosts.
+- **Hosting mirrors:** the deployed artifact already lives on Cloudflare
+  (primary) and GitHub Pages (`mirror.shanesparks.com`); flight plan in
+  `dns/zone.txt`.
+- **IPFS snapshot** of the non-demo pages remains an open, cheap option —
+  the artifact-first architecture keeps that door open (PLAN.md Phase 6).
+
 ## Layout
 
 - `src/` — authored content and templates (Eleventy input)

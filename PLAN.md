@@ -3,6 +3,13 @@
 **Architecture:** fully static site, built locally, deployed via Git to managed static hosts.
 **Governing values:** independence and self-reliance, censorship resilience within the static-Git framework, self-expression and digital aesthetics, in-browser NLP demos.
 
+> **Status (2026-07-06):** Phases 0–3 and 5 complete; site live at
+> shanesparks.com with the GitHub Pages hot standby at mirror.shanesparks.com.
+> Phase 4 underway (flagship quantum-embeddings demo shipped). Phase 6:
+> resurrection path tested and documented; second Git remote pending account
+> choice. Remaining: content placeholders (About, first essay), further
+> Phase 4 demos, optional IPFS snapshot.
+
 ---
 
 ## Guiding principles

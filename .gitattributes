@@ -6,3 +6,6 @@
 *.onnx binary
 *.whl binary
 *.zip binary
+# Vendored license texts ship as-is; normalizing them made a fresh clone
+# differ from the original working copy (Phase 6 resurrection test).
+src/fonts/LICENSE-* -text
