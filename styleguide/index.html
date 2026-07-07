@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Styleguide · Shane Sparks</title>
+	<meta name="description" content="The living design system of this site — tokens, typefaces, and open decisions.">
+	<link rel="canonical" href="https://shanesparks.com/styleguide/">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="Shane Sparks">
+	<meta property="og:title" content="Styleguide">
+	<meta property="og:description" content="The living design system of this site — tokens, typefaces, and open decisions.">
+	<meta property="og:url" content="https://shanesparks.com/styleguide/">
+	<meta name="twitter:card" content="summary">
+	<link rel="alternate" type="application/atom+xml" title="Shane Sparks" href="/feed.xml">
+	<link rel="preload" href="/fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/fonts/SpaceGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="stylesheet" href="/css/tokens.css">
+	<link rel="stylesheet" href="/css/base.css">
+	<link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+	<header class="site-header">
+		<a class="site-title" href="/">Shane Sparks</a>
+		<nav class="site-nav" aria-label="Site">
+			<a href="/">Home</a>
+			<a href="/projects/">Projects</a>
+			<a href="/writings/">Writings</a>
+			<a href="/about/">About</a>
+		</nav>
+	</header>
+
+	<main id="main">
+		
+<style>
+	/* Page-local presentation for specimens and swatches. */
+	.swatches {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+		gap: var(--space-2);
+		padding: 0;
+		list-style: none;
+	}
+	.swatch {
+		border: 1px solid var(--color-rule);
+	}
+	.swatch-chip {
+		height: 3.5rem;
+	}
+	.swatch dl {
+		margin: 0;
+		padding: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--text-s);
+	}
+	.swatch dt {
+		font-weight: 400;
+	}
+	.swatch dd {
+		margin: 0;
+	}
+	.specimen {
+		border: 1px solid var(--color-rule);
+		padding: var(--space-3);
+		margin-block: var(--space-3);
+	}
+	.specimen-charset {
+		font-family: var(--font-display);
+		word-break: break-all;
+	}
+	.scale-step {
+		margin-block: var(--space-2);
+	}
+</style>
+
+<h1>Styleguide</h1>
+
+<p>
+	The living design system of this site. Guiding principle:
+	<strong>truth to mediums</strong> — what lives on a screen should be
+	inherently of the screen. Nothing here imitates paper, plastic, or any
+	other material.
+</p>
+
+<h2>Seed palette</h2>
+
+<p>Six immutable seeds, chosen by hand.</p>
+
+<ul class="swatches">
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#005a78"></div>
+		<dl><dt>deep cyan</dt><dd>#005A78</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#75d1d9"></div>
+		<dl><dt>bright cyan</dt><dd>#75D1D9</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#ab7100"></div>
+		<dl><dt>deep amber</dt><dd>#AB7100</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#e69800"></div>
+		<dl><dt>bright amber</dt><dd>#E69800</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#fff8e7"></div>
+		<dl><dt>cosmic latte</dt><dd>#FFF8E7</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:#16161d"></div>
+		<dl><dt>eigengrau</dt><dd>#16161D</dd></dl>
+	</li>
+</ul>
+
+<h2>Section palettes</h2>
+
+<p>
+	The seeds above are the site's main scheme. Each territory of the map
+	carries its own palette and fractal energy in addition: Projects speaks
+	the cyans and ambers; Writings (provisional hexes, pending refinement)
+	grades deep purple to vermillion in its body and lavender to sandstone
+	in its fractal lace.
+</p>
+
+<ul class="swatches">
+	<li class="swatch">
+		<div class="swatch-chip" style="background:linear-gradient(90deg,#53337f 0 25%,#74385e 0 50%,#943e3d 0 75%,#b5431c 0)"></div>
+		<dl><dt>writings body</dt><dd>#53337F→#B5431C</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:linear-gradient(90deg,#b49ce0 0 25%,#c2a2bf 0 50%,#d1a89f 0 75%,#dfae7e 0)"></div>
+		<dl><dt>writings fractal</dt><dd>#B49CE0→#DFAE7E</dd></dl>
+	</li>
+</ul>
+
+<h2>Color rules</h2>
+
+<ul>
+	<li>Non-link text is always eigengrau on cosmic latte, or the inverse. No mixed or muted text colors.</li>
+	<li>Links are deep cyan on cosmic latte; bright cyan on eigengrau.</li>
+	<li>The cyans and amber are <strong>highlights</strong> — text never sits on them as a surface.</li>
+	<li>Amber may itself be text on cosmic latte only, never on eigengrau; elsewhere it is decoration (underlines, marks, symbols).</li>
+</ul>
+
+<h2>Scheme roles</h2>
+
+<p>
+	Rendered live from the active scheme — switch your system between light
+	and dark to watch them resolve. Only the rule color is derived (a
+	quantized mix of fg into bg); it draws lines, never letters.
+</p>
+
+<ul class="swatches">
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-bg)"></div>
+		<dl><dt>bg</dt><dd>--color-bg</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-fg)"></div>
+		<dl><dt>fg</dt><dd>--color-fg</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-link)"></div>
+		<dl><dt>link</dt><dd>--color-link</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-highlight)"></div>
+		<dl><dt>highlight</dt><dd>--color-highlight</dd></dl>
+	</li>
+	<li class="swatch">
+		<div class="swatch-chip" style="background:var(--color-rule)"></div>
+		<dl><dt>rule</dt><dd>derived</dd></dl>
+	</li>
+</ul>
+
+<h2>Typefaces</h2>
+
+<div class="specimen">
+	<h3 style="margin-top:0">Departure Mono — display, labels, code</h3>
+	<p style="font-family:var(--font-display); font-size:var(--text-xl); margin-block:var(--space-2)">
+		Symbols in a digital landscape
+	</p>
+	<p class="specimen-charset">
+		ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
+		0123456789 ↑↓←→ ░▒▓█ ─│┌┐└┘ &amp;@#%*{}[]&lt;&gt;
+	</p>
+	<p>
+		A pixel-grid monospace with a lo-fi technical character — quantitative
+		without being arcade nostalgia. Single weight; hierarchy comes from
+		size and space. OFL, by Helena Zhang / Toshi Omagari.
+	</p>
+</div>
+
+<div class="specimen">
+	<h3 style="margin-top:0">Space Grotesk — body prose</h3>
+	<p>
+		Body text is set in Space Grotesk, a grotesque derived from the
+		monospaced Space Mono — its geometry is quantized at the skeleton even
+		though its spacing is proportional. It exists so that essays remain
+		effortless to read at length. To commit prose fully to the pixel grid
+		instead, set <code>--font-body: var(--font-display)</code> in
+		<code>tokens.css</code> — one token, entire site follows.
+	</p>
+</div>
+
+<h2>Type scale</h2>
+
+<p>Ratio 1.2 — distinction without drama, by decision.</p>
+
+<div class="specimen">
+	<p class="scale-step" style="font-size:var(--text-2xl); font-family:var(--font-display)">2xl · 1.728rem — page titles</p>
+	<p class="scale-step" style="font-size:var(--text-xl); font-family:var(--font-display)">xl · 1.44rem — section headings</p>
+	<p class="scale-step" style="font-size:var(--text-l); font-family:var(--font-display)">l · 1.2rem — subheadings</p>
+	<p class="scale-step" style="font-size:var(--text-m)">m · 1rem — body prose</p>
+	<p class="scale-step" style="font-size:var(--text-s)">s · 0.833rem — chrome, captions, metadata</p>
+</div>
+
+<h2>Links &amp; interaction</h2>
+
+<p>
+	<a href="/">A link</a> is cyan — deep on cosmic latte, bright on
+	eigengrau — with a 2px underline. On hover the underline answers in
+	amber while the text holds its color. Selection inverts fg and bg
+	outright. Keyboard focus draws a visible 2px outline.
+</p>
+
+<h2>Alternative typefaces on file</h2>
+
+<p>
+	Candidates that also satisfy "pixel-native, not campy" — any of these can
+	replace the current picks by swapping a woff2 and one token. All open
+	licenses (OFL).
+</p>
+
+<h3>Display alternatives</h3>
+<ul>
+	<li><strong>DotGothic16</strong> (Fontworks) — 16×16 bitmap gothic; quieter and rounder than Departure Mono; excellent Japanese support.</li>
+	<li><strong>Handjet</strong> (Rosetta) — variable dot-matrix face; element shape and grid density are variable axes — the most "quantitative" option of all, striking for headlines.</li>
+	<li><strong>Workbench</strong> — variable pixel face with a scan-line axis; more industrial.</li>
+	<li><strong>Silkscreen</strong> — minimal 5px UI pixel face; best at small sizes only.</li>
+</ul>
+
+<h3>Body alternatives</h3>
+<ul>
+	<li><strong>Space Mono</strong> — Space Grotesk's monospaced parent; stricter grid feel, slower to read at length.</li>
+	<li><strong>IBM Plex Mono</strong> — engineering-room voice, very readable.</li>
+	<li><strong>Iosevka</strong> — narrow, highly configurable; can be built to taste.</li>
+	<li><strong>Departure Mono as body</strong> — the full-commitment option; honest to the grid, heavier to read for essays.</li>
+</ul>
+
+	</main>
+
+	<footer class="site-footer">
+		<nav class="footer-nav" aria-label="Meta">
+			<a href="/colophon/">Colophon</a>
+			<a href="/styleguide/">Styleguide</a>
+			<a href="/contact/">Contact</a>
+			<a href="/feed.xml">Feed</a>
+		</nav>
+		<p>© Shane Sparks. Built by hand; served as plain files; no trackers.</p>
+	</footer>
+</body>
+</html>

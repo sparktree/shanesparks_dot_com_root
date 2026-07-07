@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Colophon · Shane Sparks</title>
+	<meta name="description" content="How this site is made — tools, typefaces, colors, and principles.">
+	<link rel="canonical" href="https://shanesparks.com/colophon/">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="Shane Sparks">
+	<meta property="og:title" content="Colophon">
+	<meta property="og:description" content="How this site is made — tools, typefaces, colors, and principles.">
+	<meta property="og:url" content="https://shanesparks.com/colophon/">
+	<meta name="twitter:card" content="summary">
+	<link rel="alternate" type="application/atom+xml" title="Shane Sparks" href="/feed.xml">
+	<link rel="preload" href="/fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/fonts/SpaceGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="stylesheet" href="/css/tokens.css">
+	<link rel="stylesheet" href="/css/base.css">
+	<link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+	<header class="site-header">
+		<a class="site-title" href="/">Shane Sparks</a>
+		<nav class="site-nav" aria-label="Site">
+			<a href="/">Home</a>
+			<a href="/projects/">Projects</a>
+			<a href="/writings/">Writings</a>
+			<a href="/about/">About</a>
+		</nav>
+	</header>
+
+	<main id="main">
+		
+<h1>Colophon</h1>
+
+<p>
+	This site practices <strong>truth to mediums</strong>: what lives on a
+	screen should be inherently of the screen. Nothing here imitates paper
+	or any other material; the pixel grid is not hidden, it is the subject.
+</p>
+
+<h2>Made with</h2>
+
+<ul>
+	<li><strong>Eleventy</strong> compiles templates and Markdown into plain
+		HTML on Shane's own machine; the deployed site is inert files that any
+		web server can serve.</li>
+	<li><strong>Departure Mono</strong> (display, labels, code) and
+		<strong>Space Grotesk</strong> (body prose), both OFL-licensed and
+		self-hosted — no font is fetched from anyone else's server.</li>
+	<li>The homepage map is grown, not drawn: a seeded cellular automaton
+		shapes the field, rule 90 cascades Sierpinski triangles through the
+		Projects territory, and rule 150 weaves its lace through Writings.
+		The same structure grows on every visit.</li>
+	<li>Vanilla CSS and JavaScript throughout. No frameworks, no build
+		pipeline beyond the static compile, no third-party requests at
+		runtime.</li>
+</ul>
+
+<h2>Principles</h2>
+
+<ul>
+	<li>No analytics, no trackers, no cookies.</li>
+	<li>Everything needed to rebuild the site lives in one Git repository.</li>
+	<li>The site is deployed identically to independent hosts, so no single
+		company can take it down.</li>
+	<li>Readable without JavaScript; JavaScript only adds the living parts.</li>
+</ul>
+
+<p class="post-meta">
+	Typeset in the colors of cosmic latte, eigengrau, two cyans, and two
+	ambers — see the <a href="/styleguide/">styleguide</a> for the system.
+</p>
+
+	</main>
+
+	<footer class="site-footer">
+		<nav class="footer-nav" aria-label="Meta">
+			<a href="/colophon/">Colophon</a>
+			<a href="/styleguide/">Styleguide</a>
+			<a href="/contact/">Contact</a>
+			<a href="/feed.xml">Feed</a>
+		</nav>
+		<p>© Shane Sparks. Built by hand; served as plain files; no trackers.</p>
+	</footer>
+</body>
+</html>

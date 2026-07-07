@@ -1,0 +1,86 @@
+/* ============================================================
+   tokens.css — design tokens
+   Decisions by Shane, 2026-07-06; brief in DESIGN.md.
+   Values marked DERIVED are computed from the seed palette and
+   remain open to his revision.
+   ============================================================ */
+
+@font-face {
+	font-family: "Departure Mono";
+	src: url("/fonts/DepartureMono-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Space Grotesk";
+	src: url("/fonts/SpaceGrotesk-Variable.woff2") format("woff2-variations");
+	font-weight: 300 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+:root {
+	/* --- Seed palette: immutable, chosen by Shane ------------------
+	   #FFF8E7 is cosmic latte (the measured average color of the
+	   universe); #16161D is eigengrau (the color seen in the absence
+	   of light). Both facts, not materials — true to the medium. */
+	--seed-cyan-deep: #005a78;
+	--seed-cyan-bright: #75d1d9;
+	--seed-amber-deep: #ab7100;
+	--seed-amber-bright: #e69800;
+	--seed-cosmic-latte: #fff8e7;
+	--seed-eigengrau: #16161d;
+
+	/* --- Color rules (Shane, 2026-07-06) ----------------------------
+	   Non-link text is always eigengrau on cosmic latte or the inverse.
+	   Links: deep cyan on cosmic latte; bright cyan on eigengrau.
+	   Cyan and amber are highlights, never surfaces under text.
+	   Amber may itself be text on cosmic latte only — never on eigengrau. */
+
+	/* --- Scheme roles (light) -------------------------------------- */
+	--color-bg: var(--seed-cosmic-latte);
+	--color-fg: var(--seed-eigengrau);
+	--color-link: var(--seed-cyan-deep);
+	--color-highlight: var(--seed-amber-deep);
+	/* DERIVED: rules/borders are a quantized mix of fg into bg (non-text) */
+	--color-rule: color-mix(in oklab, var(--color-fg) 20%, var(--color-bg));
+
+	/* --- Typefaces --------------------------------------------------
+	   Display/labels/code: Departure Mono (pixel-grid, single weight).
+	   Body prose: Space Grotesk (mono-derived geometry, variable).
+	   To commit body text to the pixel grid too, set
+	   --font-body: var(--font-display); everything else follows. */
+	--font-display: "Departure Mono", ui-monospace, monospace;
+	--font-body: "Space Grotesk", system-ui, sans-serif;
+	--font-mono: "Departure Mono", ui-monospace, monospace;
+
+	/* --- Type scale: ratio 1.2, modest by decision ------------------ */
+	--text-s: 0.833rem;
+	--text-m: 1rem;
+	--text-l: 1.2rem;
+	--text-xl: 1.44rem;
+	--text-2xl: 1.728rem;
+
+	/* --- Spacing ----------------------------------------------------- */
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 1rem;
+	--space-4: 2rem;
+	--space-5: 4rem;
+
+	/* --- Layout ------------------------------------------------------ */
+	--measure: 65ch;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-bg: var(--seed-eigengrau);
+		--color-fg: var(--seed-cosmic-latte);
+		--color-link: var(--seed-cyan-bright);
+		/* Amber remains the highlight in dark, but only as decoration
+		   (underlines, marks, symbols) — never as text on eigengrau. */
+		--color-highlight: var(--seed-amber-deep);
+	}
+}

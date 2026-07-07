@@ -1,0 +1,190 @@
+/* ============================================================
+   components.css — site chrome (header, nav, footer, demo UI)
+   Chrome is set in the display face: the interface layer speaks
+   pixel-grid; prose speaks Space Grotesk.
+   ============================================================ */
+
+.site-header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--space-3);
+	padding-block: var(--space-3);
+	border-bottom: 1px solid var(--color-rule);
+	font-family: var(--font-display);
+}
+
+.site-title {
+	color: var(--color-fg);
+	text-decoration: none;
+}
+
+.site-title:hover {
+	color: var(--color-link);
+}
+
+.site-nav {
+	display: flex;
+	gap: var(--space-3);
+	font-size: var(--text-s);
+}
+
+.site-nav a {
+	text-decoration: none;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.1875em;
+}
+
+/* --- The map --------------------------------------------------------
+   Homepage centerpiece: a CA-grown pixel web (see js/pixelmap.js).
+   The whole area is one link; the label is real text on a bg plate so
+   it never sits on the cyans or amber. */
+
+/* Full-bleed: the map escapes the prose measure and spans the screen. */
+.map-stage {
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	min-height: calc(100svh - 16rem);
+	display: grid;
+	place-items: center;
+	align-content: center;
+	gap: var(--space-4);
+	overflow-x: clip;
+}
+
+.pixel-map {
+	position: relative;
+	display: block;
+	width: min(94vw, 64rem);
+	aspect-ratio: 8 / 3;
+	/* No-JS fallback: a quantized checker stands in for the web. */
+	background-image: repeating-conic-gradient(
+		var(--color-rule) 0% 25%,
+		transparent 0% 50%
+	);
+	background-size: 8px 8px;
+}
+
+.pixel-map.is-grown {
+	background-image: none;
+}
+
+.pixel-map canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	image-rendering: pixelated;
+}
+
+/* Each territory is its own link covering half the map. */
+.pixel-map-territory {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 50%;
+	display: grid;
+	place-items: center;
+	text-decoration: none;
+}
+
+.pixel-map-territory[data-side="left"] {
+	left: 0;
+}
+
+.pixel-map-territory[data-side="right"] {
+	right: 0;
+}
+
+/* Labels speak their territory's color (deep on light bg, bright on
+   dark — the same deep/bright convention as links). */
+.pixel-map-territory {
+	--territory-color: var(--color-link);
+}
+
+.pixel-map-territory[data-side="right"] {
+	--territory-color: #53337f; /* writings deep purple */
+}
+
+@media (prefers-color-scheme: dark) {
+	.pixel-map-territory[data-side="right"] {
+		--territory-color: #b49ce0; /* writings lavender */
+	}
+}
+
+.pixel-map-label {
+	padding: var(--space-1) var(--space-2);
+	background: var(--color-bg);
+	border: 1px solid var(--color-rule);
+	color: var(--territory-color);
+	font-family: var(--font-display);
+	font-size: var(--text-s);
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.1875em;
+}
+
+.pixel-map-territory:hover .pixel-map-label {
+	text-decoration-color: var(--color-highlight);
+}
+
+.pixel-map-territory:focus-visible {
+	outline: 2px solid var(--color-link);
+	outline-offset: -2px;
+}
+
+.map-tagline {
+	font-family: var(--font-display);
+	font-size: var(--text-s);
+	text-align: center;
+	margin: 0;
+}
+
+/* Footer text is full fg — non-link text is never a mixed/muted color;
+   de-emphasis comes from size and the display face alone. */
+.site-footer {
+	margin-top: var(--space-5);
+	padding-block: var(--space-3);
+	border-top: 1px solid var(--color-rule);
+	font-family: var(--font-display);
+	font-size: var(--text-s);
+}
+
+.footer-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-3);
+	margin-bottom: var(--space-2);
+}
+
+/* --- Writings ------------------------------------------------------- */
+
+.post-list {
+	list-style: none;
+	padding: 0;
+}
+
+.post-list li {
+	margin-block: var(--space-3);
+}
+
+.post-list time,
+.post-meta {
+	font-family: var(--font-display);
+	font-size: var(--text-s);
+}
+
+.post-list p {
+	margin-block: var(--space-1);
+}
+
+.post-footer {
+	margin-top: var(--space-4);
+	padding-top: var(--space-3);
+	border-top: 1px solid var(--color-rule);
+}

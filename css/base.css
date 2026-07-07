@@ -1,0 +1,122 @@
+/* ============================================================
+   base.css — element defaults and reading rhythm
+   Applies the token system; see tokens.css and DESIGN.md.
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0 auto;
+	padding: var(--space-3);
+	max-width: var(--measure);
+	background: var(--color-bg);
+	color: var(--color-fg);
+	font-family: var(--font-body);
+	font-size: var(--text-m);
+	font-weight: 400;
+	line-height: 1.6;
+}
+
+/* Headings set in the pixel-grid display face. Departure Mono has a
+   single weight, so hierarchy comes from size and space, not boldness —
+   in keeping with the modest scale decision. */
+h1,
+h2,
+h3 {
+	font-family: var(--font-display);
+	font-weight: 400;
+	line-height: 1.25;
+	margin-block: var(--space-4) var(--space-2);
+}
+
+h1 {
+	font-size: var(--text-2xl);
+}
+
+h2 {
+	font-size: var(--text-xl);
+}
+
+h3 {
+	font-size: var(--text-l);
+}
+
+a {
+	color: var(--color-link);
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.1875em;
+}
+
+/* On hover the underline answers in amber; the text itself keeps the
+   link color in both schemes (amber may not be text on eigengrau). */
+a:hover {
+	text-decoration-color: var(--color-highlight);
+}
+
+a:focus-visible {
+	outline: 2px solid var(--color-link);
+	outline-offset: 2px;
+}
+
+/* Selection inverts fg/bg — text never sits on cyan or amber. */
+::selection {
+	background: var(--color-fg);
+	color: var(--color-bg);
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* For symbolic/map imagery: never let the browser smooth the grid away. */
+.pixelated,
+img.pixelated {
+	image-rendering: pixelated;
+}
+
+code,
+pre,
+kbd,
+samp {
+	font-family: var(--font-mono);
+	font-size: 0.875em;
+}
+
+pre {
+	overflow-x: auto;
+	padding: var(--space-3);
+	border: 1px solid var(--color-rule);
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid var(--color-rule);
+	margin-block: var(--space-4);
+}
+
+/* Visually hidden, available to assistive tech. */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}
