@@ -7,6 +7,7 @@ export default function (eleventyConfig) {
 	eleventyConfig.addPassthroughCopy("src/fonts");
 	eleventyConfig.addPassthroughCopy("src/img");
 	eleventyConfig.addPassthroughCopy("src/data");
+	eleventyConfig.addPassthroughCopy({ "src/_headers": "_headers" });
 
 	// Self-hosted runtimes (Pyodide, Transformers.js) and model weights —
 	// live outside src/ because they are vendored, not authored. See PLAN.md Phase 3.

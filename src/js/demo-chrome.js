@@ -47,6 +47,7 @@ export function mountDemo(root) {
 	loadBtn.addEventListener("click", () => {
 		loadBtn.disabled = true;
 		status.textContent = "loading…";
+		if (worker) worker.terminate(); // don't orphan a failed loader on retry
 		worker = new Worker(workerUrl, { type: "module" });
 		worker.onmessage = (e) => {
 			const msg = e.data;

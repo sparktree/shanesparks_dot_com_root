@@ -159,15 +159,15 @@ description: Words become quantum states in your browser — amplitude encoding 
 		<p id="q-stats" class="post-meta"></p>
 
 		<p>state |a⟩ — one pixel per amplitude (sign as color when real; phase as hue when complex):</p>
-		<canvas class="q-strip" id="q-strip-a"></canvas>
+		<canvas class="q-strip" id="q-strip-a" role="img" aria-label="Amplitudes of quantum state A as a pixel strip"></canvas>
 		<p>state |b⟩:</p>
-		<canvas class="q-strip" id="q-strip-b"></canvas>
+		<canvas class="q-strip" id="q-strip-b" role="img" aria-label="Amplitudes of quantum state B as a pixel strip"></canvas>
 
 		<p>every measurement is one pixel — ancilla 0 in cyan, 1 in amber:</p>
-		<canvas id="q-shotmap"></canvas>
+		<canvas id="q-shotmap" role="img" aria-label="Each SWAP-test measurement as one pixel"></canvas>
 
 		<p>the estimate converging on the exact fidelity (cyan line), with its shrinking 95% interval:</p>
-		<canvas id="q-conv"></canvas>
+		<canvas id="q-conv" role="img" aria-label="Estimate converging on the exact fidelity as shots accumulate"></canvas>
 
 		<div class="q-readouts">
 			<div>amplitudes <strong id="q-amps">—</strong></div>
@@ -212,7 +212,7 @@ description: Words become quantum states in your browser — amplitude encoding 
 		</label>
 		<span id="r-rho"></span>
 	</div>
-	<canvas id="r-scatter"></canvas>
+	<canvas id="r-scatter" role="img" aria-label="Scatterplot of the selected similarity comparison across 666 SimLex noun pairs"></canvas>
 	<p class="post-meta" id="r-pair">hover a point to identify its word pair</p>
 </div>
 
