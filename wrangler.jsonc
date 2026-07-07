@@ -3,7 +3,7 @@
 // files (free and unlimited for static assets). The host stays a dumb
 // file server, per the design principles in PLAN.md.
 {
-	"name": "shanesparks-com",
+	"name": "shanesparksdotcom",
 	"compatibility_date": "2026-07-01",
 	"assets": {
 		"directory": "./_site",
