@@ -21,8 +21,8 @@
 	if (!canvas) return;
 	const ctx = canvas.getContext("2d");
 
-	const W = 256; // CA grid; one cell = one rendered pixel (8:3 oval)
-	const H = 96;
+	const W = 320; // CA grid; one cell = one rendered pixel (8:3 oval)
+	const H = 120;
 	canvas.width = W;
 	canvas.height = H;
 	host.classList.add("is-grown"); // drops the no-JS fallback pattern
@@ -37,6 +37,28 @@
 	const W_BODY = ["#53337f", "#74385e", "#943e3d", "#b5431c"];
 	const W_FRACTAL = ["#b49ce0", "#c2a2bf", "#d1a89f", "#dfae7e"];
 	const W_GLINT = "#dfae7e";
+
+	/* Quantized darkening of a palette color — full density means the
+	   automaton's pattern is expressed as light vs dark tones of each
+	   territory's own colors, never as empty pixels. */
+	/* No tone in these territories may fall below TONE_FLOOR of its
+	   color — deep hues driven lower read as gray/black, and gray
+	   belongs to no current section (reserved for a possible future
+	   one, per Shane). */
+	const TONE_FLOOR = 0.6;
+	const shadeCache = new Map();
+	function shade(hex, rawF) {
+		const f = Math.max(rawF, TONE_FLOOR);
+		const key = hex + f;
+		let c = shadeCache.get(key);
+		if (!c) {
+			const n = parseInt(hex.slice(1), 16);
+			const ch = (v) => Math.round(v * f).toString(16).padStart(2, "0");
+			c = "#" + ch(n >> 16) + ch((n >> 8) & 255) + ch(n & 255);
+			shadeCache.set(key, c);
+		}
+		return c;
+	}
 
 	/* Deterministic PRNGs (mulberry32) — the field is designed, not
 	   random: the same structure grows on every visit. */
@@ -64,7 +86,7 @@
 			const edge = 1 / (1 + Math.exp((r - 0.92) / 0.015));
 			const lobes = 0.14 * Math.sin(a * 3 + 1.7) * Math.sin(a * 5 - 0.4);
 			const ripple = 0.12 * Math.cos(r * 14 - a * 2);
-			if (rand() < edge * (0.68 + lobes + ripple)) grid[y * W + x] = 1;
+			if (rand() < edge * (0.74 + lobes + ripple)) grid[y * W + x] = 1;
 		}
 	}
 
@@ -96,12 +118,24 @@
 	   nested Sierpinski triangles. */
 	const frandP = mulberry32(0xf7ac7a1);
 	const fracP = new Uint8Array(FW * FH);
-	for (let x = 0; x < FW; x++) if (frandP() < 0.05) fracP[x] = 1;
-	for (let y = 1; y < FH; y++)
+	// sparse seeds: separated cascades keep the nested triangles legible
+	for (let x = 0; x < FW; x++) if (frandP() < 0.025) fracP[x] = 1;
+	// Hard generational break every RESEED rows: the row is REPLACED with
+	// a fresh sparse seeding (merely adding seeds lets the old cascade's
+	// XOR structure — and its giant triangles — survive underneath). No
+	// triangle can span more than one band.
+	const RESEED = 16;
+	for (let y = 1; y < FH; y++) {
+		if (y % RESEED === 0) {
+			for (let x = 0; x < FW; x++)
+				fracP[y * FW + x] = frandP() < 0.06 ? 1 : 0;
+			continue;
+		}
 		for (let x = 0; x < FW; x++)
 			fracP[y * FW + x] =
 				fracP[(y - 1) * FW + ((x + FW - 1) % FW)] ^
 				fracP[(y - 1) * FW + ((x + 1) % FW)];
+	}
 	const fcolorP = new Array(FW * FH);
 	for (let i = 0; i < FW * FH; i++)
 		if (fracP[i]) fcolorP[i] = frandP() < 0.08 ? AMBER_BRIGHT : CYAN_BRIGHT;
@@ -111,14 +145,20 @@
 	   a different energy than rule 90's clean triangles). */
 	const frandW = mulberry32(0x9a9e5);
 	const fracW = new Uint8Array(FW * FH);
-	for (let y = 0; y < FH; y++) if (frandW() < 0.14) fracW[y * FW] = 1;
-	for (let x = 1; x < FW; x++)
+	for (let y = 0; y < FH; y++) if (frandW() < 0.09) fracW[y * FW] = 1;
+	for (let x = 1; x < FW; x++) {
+		if (x % RESEED === 0) {
+			for (let y = 0; y < FH; y++)
+				fracW[y * FW + x] = frandW() < 0.06 ? 1 : 0;
+			continue;
+		}
 		for (let y = 0; y < FH; y++) {
 			const a = y > 0 ? fracW[(y - 1) * FW + x - 1] : 0;
 			const b = fracW[y * FW + x - 1];
 			const c = y < FH - 1 ? fracW[(y + 1) * FW + x - 1] : 0;
 			fracW[y * FW + x] = a ^ b ^ c;
 		}
+	}
 
 	/* --- TERRITORY GEOMETRY (extension point) ----------------------------
 	   A wavering vertical boundary near the middle; each pixel joins a
@@ -130,13 +170,19 @@
 	}
 
 	/* --- Compose cells ---------------------------------------------------
+	   FULL DENSITY: every pixel inside the ellipse is a cell — the
+	   automaton's alive/dead pattern renders as light vs dark tones of
+	   each territory's colors (quantized shades), never as absence.
 	   Within each territory: body deep, fractal bright (the layers stay
 	   color-separated so the lattice reads). Writings colors are graded
-	   by distance from the boundary, quantized to 4 steps. Alpha floors
-	   high so no region reads dull. */
-	const BASE_ALPHAS = [0.65, 0.85, 1];
-	const RIM_PX = 4; // solid boundary ring thickness, in pixels
-	const FRACTAL_INSET_PX = 8; // fractals stop short of the rim (no jagged edge)
+	   by distance from the boundary, quantized to 4 steps. All cells
+	   are opaque, so the map is identical in both color schemes. */
+	const RIM_PX = 5; // solid boundary ring thickness, in pixels
+	const FRACTAL_INSET_PX = 10; // fractals stop short of the rim (no jagged edge)
+	const LIGHT = [1, 0.85]; // tone steps for alive cells
+	/* Dark tones stay hued and well above the page background — the
+	   pattern must read as shaded territory, never as holes or gray. */
+	const DARK = [0.72, 0.6]; // tone steps for dead cells
 	const cells = [];
 	for (let y = 0; y < H; y++)
 		for (let x = 0; x < W; x++) {
@@ -153,89 +199,171 @@
 			const bx = boundaryX(y);
 			const isWritings = rand() < 1 / (1 + Math.exp(-(x - bx) / 2));
 			const fi = (y >> 1) * FW + (x >> 1);
+			const alive = grid[y * W + x];
+			let body;
+			let fractalColor = null;
+			let glint = null;
 			if (isWritings) {
 				const g = Math.max(0, Math.min(1, (x - bx) / (W - bx - 6)));
 				const q = Math.min(3, Math.floor(g * 4));
-				if (isRim) {
-					cells.push({ x, y, color: W_BODY[q], a: rand() < 0.5 ? 0.85 : 1 });
-				} else if (fracW[fi] && fractalOK) {
-					cells.push({ x, y, color: W_FRACTAL[q], a: 1 });
-				} else if (grid[y * W + x]) {
-					const n = neighbors(grid, x, y);
-					if (n >= 6 && rand() < 0.13) {
-						cells.push({ x, y, color: W_GLINT, a: rand() < 0.5 ? 0.85 : 1 });
-					} else {
-						cells.push({ x, y, color: W_BODY[q], a: BASE_ALPHAS[Math.floor(rand() * 3)] });
-					}
-				}
+				body = W_BODY[q];
+				if (fracW[fi] && fractalOK) fractalColor = W_FRACTAL[q];
+				glint = W_GLINT;
 			} else {
-				if (isRim) {
-					cells.push({ x, y, color: CYAN_DEEP, a: rand() < 0.5 ? 0.85 : 1 });
-				} else if (fracP[fi] && fractalOK) {
-					cells.push({ x, y, color: fcolorP[fi], a: 1 });
-				} else if (grid[y * W + x]) {
-					const n = neighbors(grid, x, y);
-					if (n >= 6 && rand() < 0.13) {
-						cells.push({ x, y, color: AMBER_BRIGHT, a: rand() < 0.5 ? 0.85 : 1 });
-					} else {
-						cells.push({ x, y, color: CYAN_DEEP, a: BASE_ALPHAS[Math.floor(rand() * 3)] });
-					}
-				}
+				body = CYAN_DEEP;
+				if (fracP[fi] && fractalOK) fractalColor = fcolorP[fi];
+				glint = AMBER_BRIGHT;
 			}
+			let color;
+			if (isRim) {
+				color = body;
+			} else if (fractalColor) {
+				color = fractalColor;
+			} else if (alive) {
+				color =
+					neighbors(grid, x, y) >= 6 && rand() < 0.05
+						? glint
+						: shade(body, LIGHT[Math.floor(rand() * 2)]);
+			} else {
+				color = shade(body, DARK[Math.floor(rand() * 2)]);
+			}
+			cells.push({ x, y, color });
 		}
 
-	/* Pointer reaction: a living golden vortex. Each cell near the cursor
-	   is displaced along a phase field whose angle carries the true
-	   log-spiral term φ − ln(d)/(b·spread) — b = ln(φ)/(π/2) is the
-	   golden pitch, and spread > 1 unwinds the arms so they read broad
-	   rather than spidery — plus a slow clock, so the arms rotate
-	   continuously for as long as the pointer rests on the map.
+	/* Static underlay: every cell's home pixel in a deep shadow of its
+	   own color. When the vortex carries cells away, what shows through
+	   is the same structure in shadow — never an empty pixel. */
+	const under = document.createElement("canvas");
+	under.width = W;
+	under.height = H;
+	const uctx = under.getContext("2d");
+	for (const cell of cells) {
+		uctx.fillStyle = shade(cell.color, 0.8);
+		uctx.fillRect(cell.x, cell.y, 1, 1);
+	}
+
+	/* Pointer reaction: the spiral as ORDER, not chaos. The pointer is
+	   an organizing field — cells within its reach comb themselves onto
+	   the arms of a golden spiral centered on it (phyllotaxis: order
+	   crystallizing out of the noise), and the whole pattern rotates
+	   slowly for as long as the pointer rests. Leave, and the order
+	   melts back into the grown field.
+
+	   Each cell's target is the small displacement that moves it onto
+	   the nearest arm: the arm field is ψ = φ − ln(d)/B (a log spiral
+	   whose radius grows by the golden ratio every half turn), arms are
+	   the ARMS-fold level sets of ψ, and the shift is capped at CAP
+	   pixels — order is a nudge, never an upheaval. First-order easing,
+	   no oscillation: calm is the point.
 	   (Disabled entirely under prefers-reduced-motion, as before.) */
 	const PHI = (1 + Math.sqrt(5)) / 2;
-	const SPIRAL_PITCH = Math.log(PHI) / (Math.PI / 2);
-	const SPIRAL_ROT = Math.PI / 2 - Math.atan(SPIRAL_PITCH);
-	const ARM_SPREAD = 2; // >1 = thicker, calmer arms
-	const SWIRL_RATE = 0.8; // radians per second of arm rotation
+	const B = (2 * Math.log(PHI)) / Math.PI; // golden growth per half turn
+	const GRAD = Math.sqrt(1 + 1 / (B * B)); // |∇ψ| · d (arm-spacing factor)
+	const ARMS = 5; // Fibonacci arm count
+	const R = 28; // reach of the ordering field, in grid cells
+	const CAP = 12; // max shift onto an arm, in pixels
+	const EASE = 1.25; // crystallization rate
+	const ROT = 0.7; // arm rotation at rest, radians per second
+
+	/* The flow around the order — what makes motion feel derivational
+	   rather than pinned:
+	     - the field CENTER trails the cursor on a spring (it glides,
+	       laps, and overshoots instead of teleporting);
+	     - order MELTS in proportion to pointer speed and re-crystallizes
+	       on arrival (ebb and flow);
+	     - stirring spins the arms faster; rest returns them to serenity;
+	     - a slow breath modulates the arm strength even in stillness. */
+	const CENTER_K = 0.05; // spring pulling the field center to the cursor
+	const CENTER_D = 0.82; // its damping (lower = more overshoot)
+	const MELT = 0.35; // how strongly speed dissolves the order
+	const SPIN = 0.25; // extra rotation per unit pointer speed
+	const BREATH = 0.15; // depth of the at-rest breathing
+	const TWO_PI = Math.PI * 2;
 	const ox = new Float32Array(cells.length);
 	const oy = new Float32Array(cells.length);
 	let pointer = null;
+	let prevPtr = null;
+	let fx = null; // field center (lags the cursor)
+	let fy = null;
+	let fvx = 0;
+	let fvy = 0;
+	let speed = 0; // smoothed pointer speed
+	let phase = 0; // accumulated arm rotation
+	let lastT = 0;
 	let raf = 0;
 
 	function draw() {
+		/* The shadow underlay replaces clearing: vacated pixels reveal
+		   the same structure in shadow, never the page background. */
 		ctx.clearRect(0, 0, W, H);
+		ctx.drawImage(under, 0, 0);
 		for (let i = 0; i < cells.length; i++) {
 			const cell = cells[i];
-			ctx.globalAlpha = cell.a;
 			ctx.fillStyle = cell.color;
 			ctx.fillRect(Math.round(cell.x + ox[i]), Math.round(cell.y + oy[i]), 1, 1);
 		}
-		ctx.globalAlpha = 1;
 	}
 
 	function tick() {
-		const R = 24; // influence radius, in grid cells
-		const t = performance.now() / 1000;
+		const now = performance.now() / 1000;
+		const dt = Math.min(now - lastT || 0.016, 0.05);
+		lastT = now;
+
+		/* Field center glides after the cursor; speed is measured and
+		   smoothed; the arms spin faster when stirred. */
+		if (pointer) {
+			if (fx === null) {
+				fx = pointer.x;
+				fy = pointer.y;
+			}
+			fvx += (pointer.x - fx) * CENTER_K;
+			fvy += (pointer.y - fy) * CENTER_K;
+			fvx *= CENTER_D;
+			fvy *= CENTER_D;
+			fx += fvx;
+			fy += fvy;
+			if (prevPtr) {
+				const sp = Math.hypot(pointer.x - prevPtr.x, pointer.y - prevPtr.y);
+				speed += (sp - speed) * 0.25;
+			}
+			prevPtr = pointer;
+		} else {
+			speed *= 0.9;
+			prevPtr = null;
+		}
+		phase += dt * (ROT + speed * SPIN);
+
+		/* Order ebbs with motion and breathes at rest. */
+		const melt = 1 / (1 + speed * MELT);
+		const breath = 1 - BREATH / 2 + (BREATH / 2) * Math.sin(now * 0.9);
+		const capE = CAP * melt * breath;
+
+		const s = TWO_PI / ARMS;
 		let settled = true;
 		for (let i = 0; i < cells.length; i++) {
 			let tx = 0;
 			let ty = 0;
-			if (pointer) {
-				const dx = cells[i].x - pointer.x;
-				const dy = cells[i].y - pointer.y;
+			if (pointer && fx !== null) {
+				const dx = cells[i].x - fx;
+				const dy = cells[i].y - fy;
 				const d = Math.hypot(dx, dy);
-				if (d < R && d > 0.001) {
-					const f = (1 - d / R) * 5;
-					const theta =
-						Math.atan2(dy, dx) +
-						SPIRAL_ROT +
-						t * SWIRL_RATE -
-						Math.log(Math.max(d, 1)) / (SPIRAL_PITCH * ARM_SPREAD);
-					tx = Math.cos(theta) * f;
-					ty = Math.sin(theta) * f;
+				if (d < R && d > 2) {
+					/* misalignment from the nearest (rotating) spiral arm */
+					const psi = Math.atan2(dy, dx) - Math.log(d) / B + phase;
+					let m = psi % s;
+					if (m < 0) m += s;
+					m -= s / 2;
+					/* linear distance to the arm, capped; shift along ∇ψ */
+					const lin = Math.max(-capE, Math.min(capE, (m * d) / GRAD));
+					const ux = dx / d;
+					const uy = dy / d;
+					const w = 1 - d / R;
+					tx = ((-(-uy - ux / B) * lin) / GRAD) * w;
+					ty = ((-(ux - uy / B) * lin) / GRAD) * w;
 				}
 			}
-			ox[i] += (tx - ox[i]) * 0.18;
-			oy[i] += (ty - oy[i]) * 0.18;
+			ox[i] += (tx - ox[i]) * EASE;
+			oy[i] += (ty - oy[i]) * EASE;
 			if (Math.abs(ox[i]) > 0.05 || Math.abs(oy[i]) > 0.05) settled = false;
 		}
 		draw();

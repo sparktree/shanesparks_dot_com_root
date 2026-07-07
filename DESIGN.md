@@ -69,6 +69,17 @@ the way music does. **Use this to resolve any design ambiguity.**
    dithering tightened (sigmoid width 5 → 2) so the palettes bleed less.
    Runtime hello-world demos removed (superseded by the quantum demo);
    Pyodide stays vendored for future Phase 4 work.
+   *Map v2, tuned with Shane live (2026-07-07):* FULL DENSITY — the automaton's
+   pattern renders as light/dark tones of each territory's colors (TONE_FLOOR 0.6:
+   nothing may fade to gray — gray is reserved for a possible future section), with
+   a shadow underlay so motion reveals structure-in-shadow, never emptiness.
+   320×120 grid; rule-90/150 cascades hard-reset every 16 fractal rows so no
+   triangle dominates. The pointer is an ORDERING field, not a stirrer:
+   phyllotaxis — cells comb onto the arms of a 5-fold golden spiral (ψ = φ −
+   ln(d)/B, B = golden growth per half turn) that rotates; the field center
+   trails the cursor on a spring, order melts with pointer speed and
+   re-crystallizes at rest, arms spin faster when stirred, and the arm strength
+   breathes. Shane's calibration: R 28, CAP 12, EASE 1.25, ROT 0.7.
 4. **Signature element** — baked into the layout; a recurring motif of symbols in a
    digital landscape / cyberspace. Exploit the medium maximally; each page corresponds
    in vivid style to its content's "environment."
